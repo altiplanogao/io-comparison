@@ -24,4 +24,11 @@ abstract class ContentCommand implements Command {
     public byte[] toBytes() {
         return data;
     }
+
+    @Override
+    public String toString() {
+        String content = getContent();
+        return this.getClass().getSimpleName() +
+                " \"" + content + "\"(" + content.length() + ")";
+    }
 }

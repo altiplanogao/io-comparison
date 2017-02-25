@@ -1,9 +1,7 @@
 package being.altiplano.ioservice.bio;
 
-import being.altiplano.config.ServerConfig;
-import being.altiplano.ioservice.IServer;
+import being.altiplano.ioservice.AbstractServer;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -15,19 +13,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Created by gaoyuan on 20/02/2017.
  */
-public class BioServer implements IServer {
-    private final int PORT;
+public class BioServer extends AbstractServer {
     private final ExecutorService executorService;
     private volatile ServerSocket serverSocket;
     private final AtomicBoolean running = new AtomicBoolean(false);
     private CountDownLatch connectionLatch;
 
-    public BioServer() {
-        this(ServerConfig.DEFAULT_PORT);
-    }
-
-    public BioServer(int PORT) {
-        this.PORT = PORT;
+    public BioServer(int port) {
+        super(port);
         serverSocket = null;
         int cpu = Runtime.getRuntime().availableProcessors();
         executorService = Executors.newFixedThreadPool(cpu * 8);
@@ -35,13 +28,14 @@ public class BioServer implements IServer {
 
     @Override
     public void start() throws IOException {
-        if(running.compareAndSet(false, true)){
-            final ServerSocket ss = new ServerSocket(PORT);
+        if (running.compareAndSet(false, true)) {
+            final ServerSocket ss = new ServerSocket(port);
             final CountDownLatch latch = new CountDownLatch(1);
 
             Runnable acceptConnectionRunnable = new Runnable() {
                 @Override
                 public void run() {
+                    Thread.currentThread().setName("BioServerAccept");
                     try {
                         while (running.get()) {
                             try {
@@ -53,7 +47,7 @@ public class BioServer implements IServer {
                                 }
                             }
                         }
-                    }finally {
+                    } finally {
                         latch.countDown();
                     }
                 }
@@ -67,12 +61,12 @@ public class BioServer implements IServer {
     @Override
     public void stop(boolean waitDone) throws IOException, InterruptedException {
         final CountDownLatch latch = connectionLatch;
-        if(running.compareAndSet(true, false)){
+        if (running.compareAndSet(true, false)) {
             if (serverSocket != null) {
                 serverSocket.close();
                 serverSocket = null;
             }
-            if(waitDone){
+            if (waitDone) {
                 latch.await();
             }
         }

@@ -4,6 +4,7 @@ import being.altiplano.config.Command;
 import being.altiplano.config.Msg;
 import being.altiplano.config.MsgConverter;
 import being.altiplano.config.Reply;
+import being.altiplano.ioservice.IServerConnection;
 
 import java.io.Closeable;
 import java.io.DataInputStream;
@@ -14,50 +15,32 @@ import java.net.Socket;
 /**
  * Created by gaoyuan on 21/02/2017.
  */
-class ServerConnection implements Closeable {
+class BioServerConnection implements IServerConnection, Closeable {
     private final Socket socket;
     private final DataInputStream input;
     private final DataOutputStream out;
 
-//    private final static int BUFFER_LENGTH = 16;
-//    private final byte[] buffer = new byte[BUFFER_LENGTH];
-//    private final int offset = 0;
-
-    public ServerConnection(Socket socket) throws IOException {
+    public BioServerConnection(Socket socket) throws IOException {
         this.socket = socket;
         input = new DataInputStream(socket.getInputStream());
         out = new DataOutputStream(socket.getOutputStream());
     }
 
-    Command readCommand() throws IOException {
-        final int code = input.readInt();
-        byte[] bytes = null;
+    @Override
+    public Command readCommand() throws IOException {
+        Msg msg = null;
         synchronized (input) {
-            final int length = input.readInt();
-            if (length > 0) {
-                bytes = new byte[length];
-                int offset = 0;
-                int remain = length - offset;
-                while (remain != 0) {
-                    offset += input.read(bytes, offset, remain);
-                    remain = length - offset;
-                }
-            }
+            msg = BioStreamHelper.readMsg(input);
         }
-        Msg msg = new Msg(code, bytes);
         return MsgConverter.convert(msg);
     }
 
+    @Override
     public void writeReply(Reply reply) throws IOException {
         synchronized (out) {
             int code = reply.code();
             byte[] data = reply.toBytes();
-            final int length = data.length;
-            out.writeInt(code);
-            out.writeInt(data.length);
-            int offset = 0;
-            int remain = length - offset;
-            out.write(data, offset, remain);
+            BioStreamHelper.write(out, code, data);
         }
     }
 

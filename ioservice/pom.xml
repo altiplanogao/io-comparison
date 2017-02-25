@@ -45,7 +45,6 @@
         <dependency>
             <groupId>net.moznion</groupId>
             <artifactId>random-string</artifactId>
-            <version>1.1.0</version>
             <scope>test</scope>
         </dependency>
 

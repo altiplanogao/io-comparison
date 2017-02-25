@@ -14,7 +14,7 @@ public class StartCommand extends ContentCommand {
         super(data);
     }
 
-    public StartCommand(Config config){
+    public StartCommand(Config config) {
         this(new Gson().toJson(config));
     }
 

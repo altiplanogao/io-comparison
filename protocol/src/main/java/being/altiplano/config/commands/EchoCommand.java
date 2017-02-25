@@ -44,4 +44,9 @@ public class EchoCommand extends ContentCommand {
             return ByteBuffer.allocate(4).putInt(0).array();
         }
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + " x" + times();
+    }
 }

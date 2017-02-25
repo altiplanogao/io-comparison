@@ -30,4 +30,9 @@ public class CountReply implements Reply {
     public byte[] toBytes() {
         return ByteBuffer.allocate(4).putInt(count).array();
     }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + " " + count;
+    }
 }

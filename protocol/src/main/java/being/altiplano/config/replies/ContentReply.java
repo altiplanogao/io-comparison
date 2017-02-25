@@ -24,4 +24,11 @@ abstract class ContentReply implements Reply {
     public byte[] toBytes() {
         return MsgConverter.stringToBytes(content);
     }
+
+    @Override
+    public String toString() {
+        String content = getContent();
+        return this.getClass().getSimpleName() +
+                " \"" + content + "\"(" + content.length() + ")";
+    }
 }
