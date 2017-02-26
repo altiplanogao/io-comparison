@@ -13,7 +13,7 @@ import java.nio.channels.SocketChannel;
 /**
  * Created by gaoyuan on 24/02/2017.
  */
-public class NioServerConnection implements IServerConnection {
+class NioServerConnection implements IServerConnection {
     private final SocketChannel channel;
     ByteBuffer header = ByteBuffer.allocate(8);
     ByteBuffer body = ByteBuffer.allocate(16);

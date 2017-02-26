@@ -7,4 +7,9 @@ public interface Reply {
     int code();
 
     byte[] toBytes();
+
+    default Msg toMsg() {
+        return new Msg(code(), toBytes());
+    }
+
 }

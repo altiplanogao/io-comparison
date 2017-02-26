@@ -1,5 +1,7 @@
 package being.altiplano.ioservice;
 
+import being.altiplano.ioservice.aio.AioClient;
+import being.altiplano.ioservice.aio.AioServer;
 import being.altiplano.ioservice.bio.BioClient;
 import being.altiplano.ioservice.bio.BioServer;
 import being.altiplano.ioservice.junitext.PrintEntrance;
@@ -107,45 +109,67 @@ public class ServerClientTest extends ServerClientTestBase {
         }
     }
 
-    protected final Class<? extends IServer>[] serverTypes = new Class[]{BioServer.class, NioServer.class};
-    protected final Class<? extends IClient>[] clientTypes = new Class[]{BioClient.class};
+    protected final Class<? extends IServer>[] serverTypes = new Class[]{
+            BioServer.class,
+            NioServer.class,
+            AioServer.class
+    };
+    protected final Class<? extends IClient>[] clientTypes = new Class[]{
+            BioClient.class,
+            NioClient.class,
+            AioClient.class
+    };
 
-//    @Test(timeout = 10_000)
-//    public void test_BioServer_BioClient() throws IOException {
-//        final Class<? extends IServer> serverClz = BioServer.class;
-//        final Class<? extends IClient> clientClz = BioClient.class;
-//        doTest_SC(serverClz, clientClz);
-//    }
+    @Test(timeout = 10_000)
+    public void test_BioServer_BioClient() throws IOException {
+        final Class<? extends IServer> serverClz = BioServer.class;
+        final Class<? extends IClient> clientClz = BioClient.class;
+        doTest_SC(serverClz, clientClz);
+    }
 
-    @Test(timeout = 1000_000)
-    public void test_BioServer_NioClient() throws IOException {
+    @Test(timeout = 10_000)
+    public void test_NioServer() throws IOException {
+        final Class<? extends IServer> serverClz = NioServer.class;
+        final Class<? extends IClient> clientClz = BioClient.class;
+        doTest_SC(serverClz, clientClz);
+    }
+
+    @Test(timeout = 10_000)
+    public void test_NioClient() throws IOException {
         final Class<? extends IServer> serverClz = BioServer.class;
         final Class<? extends IClient> clientClz = NioClient.class;
         doTest_SC(serverClz, clientClz);
     }
 
-//    @Test(timeout = 10_000)
-//    public void test_NioServer_BioClient() throws IOException {
-//        final Class<? extends IServer> serverClz = NioServer.class;
-//        final Class<? extends IClient> clientClz = BioClient.class;
-//        doTest_SC(serverClz, clientClz);
-//    }
+    @Test(timeout = 500_000)
+    public void test_AioServer() throws IOException {
+        final Class<? extends IServer> serverClz = AioServer.class;
+        final Class<? extends IClient> clientClz = BioClient.class;
+        doTest_SC(serverClz, clientClz);
+    }
 
-//    @Test
-//    public void test_XServer_XClient() throws IOException {
-//        for (Class<? extends IServer> serverClz : serverTypes){
-//            for (Class<? extends IClient> clientClz : clientTypes ){
-//                doTest_SC(serverClz, clientClz);
-//            }
-//        }
-//    }
-//
-//    @Test
-//    public void test_XServer_XClient_N() throws IOException {
-//        for (Class<? extends IServer> serverClz : serverTypes){
-//            for (Class<? extends IClient> clientClz : clientTypes ){
-//                doTest_SnC(serverClz, clientClz);
-//            }
-//        }
-//    }
+    @Test(timeout = 10_000)
+    public void test_AioClient() throws IOException {
+        final Class<? extends IServer> serverClz = BioServer.class;
+        final Class<? extends IClient> clientClz = AioClient.class;
+        doTest_SC(serverClz, clientClz);
+    }
+
+    @Test
+    public void test_XServer_XClient() throws IOException {
+        for (Class<? extends IServer> serverClz : serverTypes) {
+            for (Class<? extends IClient> clientClz : clientTypes) {
+                doTest_SC(serverClz, clientClz);
+            }
+        }
+    }
+
+    @Test
+    public void test_XServer_XClient_N() throws IOException {
+        for (Class<? extends IServer> serverClz : serverTypes) {
+            for (Class<? extends IClient> clientClz : clientTypes) {
+                doTest_SnC(serverClz, clientClz);
+            }
+        }
+    }
 }

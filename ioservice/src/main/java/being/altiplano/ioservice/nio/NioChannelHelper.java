@@ -10,7 +10,7 @@ import java.nio.channels.SocketChannel;
 /**
  * Created by gaoyuan on 25/02/2017.
  */
-public class NioChannelHelper {
+class NioChannelHelper {
     public static Msg readMsg(SocketChannel channel, ByteBuffer header, ByteBuffer body) throws IOException {
         ByteBuffer[] bufferArray = {header, body};
         do {

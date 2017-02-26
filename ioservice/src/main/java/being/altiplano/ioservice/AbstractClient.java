@@ -32,7 +32,7 @@ public abstract class AbstractClient implements IClient {
             synchronized (clientConnection) {
                 clientConnection.writeCommand(command);
                 Reply reply = clientConnection.readReply();
-                return (T)reply;
+                return (T) reply;
             }
         } finally {
         }

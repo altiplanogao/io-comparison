@@ -15,4 +15,8 @@ public interface Command {
     int code();
 
     byte[] toBytes();
+
+    default Msg toMsg() {
+        return new Msg(code(), toBytes());
+    }
 }

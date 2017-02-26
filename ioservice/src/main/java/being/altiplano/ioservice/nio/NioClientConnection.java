@@ -13,7 +13,7 @@ import java.nio.channels.SocketChannel;
 /**
  * Created by gaoyuan on 25/02/2017.
  */
-public class NioClientConnection implements IClientConnection {
+class NioClientConnection implements IClientConnection {
     private SocketChannel channel;
     ByteBuffer r_header = ByteBuffer.allocate(8);
     ByteBuffer r_body = ByteBuffer.allocate(16);
