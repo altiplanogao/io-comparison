@@ -4,12 +4,16 @@ import being.altiplano.ioservice.aio.AioClient;
 import being.altiplano.ioservice.aio.AioServer;
 import being.altiplano.ioservice.bio.BioClient;
 import being.altiplano.ioservice.bio.BioServer;
+import being.altiplano.ioservice.junitext.IgnoreTest;
 import being.altiplano.ioservice.junitext.PrintEntrance;
+import being.altiplano.ioservice.mina.MinaClient;
+import being.altiplano.ioservice.mina.MinaServer;
 import being.altiplano.ioservice.nio.NioClient;
 import being.altiplano.ioservice.nio.NioServer;
 import org.hamcrest.CoreMatchers;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.IOException;
 import java.util.Random;
@@ -19,6 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created by gaoyuan on 22/02/2017.
  */
+@RunWith(IgnoreTest.class)
 public class ServerClientTest extends ServerClientTestBase {
 
     @Rule
@@ -112,12 +117,14 @@ public class ServerClientTest extends ServerClientTestBase {
     protected final Class<? extends IServer>[] serverTypes = new Class[]{
             BioServer.class,
             NioServer.class,
-            AioServer.class
+            AioServer.class,
+ //           MinaServer.class,
     };
     protected final Class<? extends IClient>[] clientTypes = new Class[]{
             BioClient.class,
             NioClient.class,
-            AioClient.class
+            AioClient.class,
+ //           MinaClient.class,
     };
 
     @Test(timeout = 10_000)
@@ -141,7 +148,7 @@ public class ServerClientTest extends ServerClientTestBase {
         doTest_SC(serverClz, clientClz);
     }
 
-    @Test(timeout = 500_000)
+    @Test(timeout = 10_000)
     public void test_AioServer() throws IOException {
         final Class<? extends IServer> serverClz = AioServer.class;
         final Class<? extends IClient> clientClz = BioClient.class;
@@ -155,7 +162,21 @@ public class ServerClientTest extends ServerClientTestBase {
         doTest_SC(serverClz, clientClz);
     }
 
-    @Test
+    @Test(timeout = 1000_000)
+    public void test_MinaServer() throws IOException {
+        final Class<? extends IServer> serverClz = MinaServer.class;
+        final Class<? extends IClient> clientClz = BioClient.class;
+        doTest_SC(serverClz, clientClz);
+    }
+
+    @Test(timeout = 10_000)
+    public void test_MinaClient() throws IOException {
+        final Class<? extends IServer> serverClz = BioServer.class;
+        final Class<? extends IClient> clientClz = MinaClient.class;
+        doTest_SC(serverClz, clientClz);
+    }
+
+    @Test(timeout = 10_000)
     public void test_XServer_XClient() throws IOException {
         for (Class<? extends IServer> serverClz : serverTypes) {
             for (Class<? extends IClient> clientClz : clientTypes) {
@@ -164,7 +185,7 @@ public class ServerClientTest extends ServerClientTestBase {
         }
     }
 
-    @Test
+    @Test(timeout = 10_000)
     public void test_XServer_XClient_N() throws IOException {
         for (Class<? extends IServer> serverClz : serverTypes) {
             for (Class<? extends IClient> clientClz : clientTypes) {
