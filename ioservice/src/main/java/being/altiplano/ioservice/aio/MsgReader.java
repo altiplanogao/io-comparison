@@ -9,12 +9,12 @@ import java.nio.channels.CompletionHandler;
 /**
  * Created by gaoyuan on 26/02/2017.
  */
-public class MsgReader {
+class MsgReader {
     static final int bufferSize = 16; //must > 8
     private final AsynchronousSocketChannel channel;
     private final ByteBuffer buffer;
 
-    class ReadPackage implements CompletionHandler<Integer, ReadPackage> {
+    class Package implements CompletionHandler<Integer, Package> {
         private boolean headDone = false;
         private int code = 0;
         private int len = 0;
@@ -23,7 +23,7 @@ public class MsgReader {
         private int bytesRead = 0;
 
         @Override
-        public void completed(Integer result, ReadPackage attachment) {
+        public void completed(Integer result, Package attachment) {
             if (result < 0) {
                 return;
             } else {
@@ -58,7 +58,7 @@ public class MsgReader {
         }
 
         @Override
-        public void failed(Throwable exc, ReadPackage attachment) {
+        public void failed(Throwable exc, Package attachment) {
             exc.printStackTrace();
         }
     }
@@ -69,7 +69,7 @@ public class MsgReader {
     }
 
     public void read() {
-        ReadPackage pack = new ReadPackage();
+        Package pack = new Package();
         channel.read(buffer, pack, pack);
     }
 

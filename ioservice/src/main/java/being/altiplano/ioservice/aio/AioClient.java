@@ -54,30 +54,21 @@ public class AioClient extends AbstractClient {
     }
 
     @Override
-    public void connect() throws IOException {
+    public void connect() throws IOException, InterruptedException {
         close();
         socketChannel = AsynchronousSocketChannel.open();
         Future connect = socketChannel.connect(new InetSocketAddress(this.address, this.port));
         try {
             connect.get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-        clientConnection = null;
         writer = new ClientMsgWriter(socketChannel);
         reader = new ClientMsgReader(socketChannel);
     }
 
     @Override
-    public void disConnect() throws IOException {
-        close();
-    }
-
-    @Override
-    public void close() throws IOException {
-        super.close();
+    public void disConnect() throws IOException, InterruptedException {
         if (socketChannel != null) {
             socketChannel.close();
             socketChannel = null;

@@ -1,4 +1,4 @@
-package being.altiplano.ioservice.junitext;
+package being.altiplano.ioservice.junitext.runner;
 
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
@@ -19,7 +19,7 @@ public class MultiThreadRunner extends BlockJUnit4ClassRunner {
         int maxThreads = Runtime.getRuntime().availableProcessors();
         es = Executors.newFixedThreadPool(maxThreads);
     }
-    
+
     public MultiThreadRunner(Class<?> klass) throws InitializationError {
         super(klass);
     }

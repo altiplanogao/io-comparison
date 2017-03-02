@@ -131,10 +131,14 @@ public class ServerClientTestBase {
 
     protected void closeSocketClient(IClient client) throws IOException {
         checkStop(client);
-        client.disConnect();
+        try {
+            client.disConnect();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
-    protected IClient createSocketClient(Class<? extends IClient> clientClz) throws IOException {
+    protected IClient createClient(Class<? extends IClient> clientClz) throws IOException {
         IClient client = null;
         try {
             client = clientClz.getConstructor(String.class, int.class)
@@ -143,12 +147,16 @@ public class ServerClientTestBase {
                 InvocationTargetException | NoSuchMethodException e) {
             collector.addError(e);
         }
-        client.connect();
+        try {
+            client.connect();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         checkStart(client);
         return client;
     }
 
-    protected IServer createSocketServer(Class<? extends IServer> serverClz) throws IOException {
+    protected IServer createServer(Class<? extends IServer> serverClz) throws IOException {
         IServer server = null;
         try {
             server = serverClz.getConstructor(int.class).newInstance(TestConfig.PORT);

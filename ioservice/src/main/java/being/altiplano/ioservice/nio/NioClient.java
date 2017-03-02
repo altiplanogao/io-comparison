@@ -1,6 +1,7 @@
 package being.altiplano.ioservice.nio;
 
-import being.altiplano.ioservice.AbstractClient;
+import being.altiplano.ioservice.ConnectionClient;
+import being.altiplano.ioservice.IClientAccess;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -9,23 +10,28 @@ import java.nio.channels.SocketChannel;
 /**
  * Created by gaoyuan on 23/02/2017.
  */
-public class NioClient extends AbstractClient {
-    SocketChannel socketChannel;
+public class NioClient extends ConnectionClient {
+    private SocketChannel socketChannel;
 
     public NioClient(String address, int port) {
         super(address, port);
     }
 
     @Override
-    public void connect() throws IOException {
-        close();
+    protected void doConnect() throws IOException, InterruptedException {
         socketChannel = SocketChannel.open();
         socketChannel.connect(new InetSocketAddress(this.address, this.port));
-        clientConnection = new NioClientConnection(socketChannel);
     }
 
     @Override
-    public void disConnect() throws IOException {
-        close();
+    protected void doDisConnect() throws IOException, InterruptedException {
+        if (socketChannel != null) {
+            socketChannel.close();
+        }
+    }
+
+    @Override
+    protected IClientAccess createAccess() throws IOException {
+        return new NioClientAccess(socketChannel);
     }
 }

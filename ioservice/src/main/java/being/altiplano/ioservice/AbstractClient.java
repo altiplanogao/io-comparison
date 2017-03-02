@@ -13,30 +13,21 @@ import java.io.IOException;
 public abstract class AbstractClient implements IClient {
     protected final String address;
     protected final int port;
-    protected IClientConnection clientConnection;
 
     public AbstractClient(String address, int port) {
         this.address = address;
         this.port = port;
     }
 
-    public void close() throws IOException {
-        if (clientConnection != null) {
-            clientConnection.close();
-            clientConnection = null;
+    public final void close() throws IOException {
+        try {
+            disConnect();
+        } catch (InterruptedException e) {
+            throw new IOException(e);
         }
     }
 
-    protected <T extends Reply> T writeAndRead(Command command) throws IOException {
-        try {
-            synchronized (clientConnection) {
-                clientConnection.writeCommand(command);
-                Reply reply = clientConnection.readReply();
-                return (T) reply;
-            }
-        } finally {
-        }
-    }
+    protected abstract <T extends Reply> T writeAndRead(Command command) throws IOException;
 
     @Override
     public StartReply call(StartCommand command) throws IOException {

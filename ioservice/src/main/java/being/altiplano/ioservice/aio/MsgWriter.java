@@ -9,7 +9,7 @@ import java.nio.channels.CompletionHandler;
 /**
  * Created by gaoyuan on 26/02/2017.
  */
-public class MsgWriter {
+class MsgWriter {
     static final int bufferSize = 16; //must > 8
     private final AsynchronousSocketChannel channel;
     private final ByteBuffer buffer;

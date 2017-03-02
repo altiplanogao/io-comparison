@@ -11,7 +11,7 @@ import java.nio.channels.AsynchronousSocketChannel;
 /**
  * Created by gaoyuan on 24/02/2017.
  */
-public class AioServerConnection {
+class AioServerConnection {
     private final AsynchronousSocketChannel channel;
     private final ServerCommandHandler commandHandler = new ServerCommandHandler();
     private final MsgReader reader;

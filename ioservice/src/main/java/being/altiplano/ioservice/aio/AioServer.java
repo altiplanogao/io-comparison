@@ -33,15 +33,16 @@ public class AioServer extends AbstractServer {
 
         @Override
         public void failed(Throwable exc, AioServer serverHandler) {
-            exc.printStackTrace();
             if (exc instanceof AsynchronousCloseException) {
                 connectionLatch.countDown();
+            } else {
+                exc.printStackTrace();
             }
         }
     }
 
     @Override
-    public void start() throws IOException {
+    public void start() throws IOException, InterruptedException {
         if (running.compareAndSet(false, true)) {
             final CountDownLatch latch = new CountDownLatch(1);
 
@@ -59,22 +60,18 @@ public class AioServer extends AbstractServer {
     public void stop(boolean waitDone) throws IOException, InterruptedException {
         final CountDownLatch latch = connectionLatch;
         if (running.compareAndSet(true, false)) {
-            if (serverSocketChannel != null) {
-                serverSocketChannel.close();
-                serverSocketChannel = null;
+            try {
+                if (serverSocketChannel != null) {
+                    serverSocketChannel.close();
+                    serverSocketChannel = null;
+                }
+            } catch (AsynchronousCloseException e) {
+                e.printStackTrace();
+            } finally {
+                if (waitDone) {
+                    latch.await();
+                }
             }
-            if (waitDone) {
-                latch.await();
-            }
-        }
-    }
-
-    @Override
-    public void close() throws IOException {
-        try {
-            stop(true);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 }

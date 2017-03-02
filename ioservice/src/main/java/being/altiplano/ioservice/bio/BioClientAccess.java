@@ -4,7 +4,7 @@ import being.altiplano.config.Command;
 import being.altiplano.config.Msg;
 import being.altiplano.config.MsgConverter;
 import being.altiplano.config.Reply;
-import being.altiplano.ioservice.IClientConnection;
+import being.altiplano.ioservice.IClientAccess;
 
 import java.io.Closeable;
 import java.io.DataInputStream;
@@ -15,12 +15,12 @@ import java.net.Socket;
 /**
  * Created by gaoyuan on 22/02/2017.
  */
-class BioClientConnection implements IClientConnection, Closeable {
+class BioClientAccess implements IClientAccess, Closeable {
     private final Socket socket;
     private final DataInputStream input;
     private final DataOutputStream out;
 
-    public BioClientConnection(Socket socket) throws IOException {
+    public BioClientAccess(Socket socket) throws IOException {
         this.socket = socket;
         input = new DataInputStream(socket.getInputStream());
         out = new DataOutputStream(socket.getOutputStream());

@@ -29,7 +29,7 @@ public class MsgConverter {
             case Command.UPPER_CAST:
                 return new UpperCastCommand(msg.data);
             default:
-                throw new IllegalStateException("msg code not supported.");
+                throw new IllegalStateException("msg code " + code + " not supported.");
         }
     }
 
@@ -51,7 +51,7 @@ public class MsgConverter {
             case Command.UPPER_CAST:
                 return new UpperCastReply(msg.data);
             default:
-                throw new IllegalStateException("msg code not supported.");
+                throw new IllegalStateException("msg code " + code + " not supported.");
         }
     }
 

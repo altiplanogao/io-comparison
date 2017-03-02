@@ -27,7 +27,7 @@ public class BioServer extends AbstractServer {
     }
 
     @Override
-    public void start() throws IOException {
+    public void start() throws IOException, InterruptedException {
         if (running.compareAndSet(false, true)) {
             final ServerSocket ss = new ServerSocket(port);
             final CountDownLatch latch = new CountDownLatch(1);
@@ -72,12 +72,4 @@ public class BioServer extends AbstractServer {
         }
     }
 
-    @Override
-    public void close() throws IOException {
-        try {
-            stop(true);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 }

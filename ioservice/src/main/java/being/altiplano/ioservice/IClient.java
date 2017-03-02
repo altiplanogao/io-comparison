@@ -10,9 +10,9 @@ import java.io.IOException;
  * Created by gaoyuan on 23/02/2017.
  */
 public interface IClient extends Closeable {
-    void connect() throws IOException;
+    void connect() throws IOException, InterruptedException;
 
-    void disConnect() throws IOException;
+    void disConnect() throws IOException, InterruptedException;
 
     StartReply call(StartCommand command) throws IOException;
 

@@ -5,6 +5,7 @@ import being.altiplano.config.Reply;
 import being.altiplano.config.replies.StopReply;
 import being.altiplano.ioservice.ServerCommandHandler;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 
@@ -13,8 +14,8 @@ import java.net.Socket;
  */
 
 class ServerConnectionRunnable implements Runnable {
-    private Socket socket;
-    private ServerCommandHandler commandHandler = new ServerCommandHandler();
+    private final Socket socket;
+    private final ServerCommandHandler commandHandler = new ServerCommandHandler();
 
     private void log(String content) {
         System.out.println("    Server " + content);
@@ -38,11 +39,13 @@ class ServerConnectionRunnable implements Runnable {
                     nextCmd = false;
                 }
             } while (nextCmd);
+        } catch (EOFException e) {
+            if (!socket.isClosed()) {
+                e.printStackTrace();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
         }
     }
-
-
 }

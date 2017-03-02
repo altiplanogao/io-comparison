@@ -32,7 +32,7 @@ public class NioServer extends AbstractServer {
     }
 
     @Override
-    public void start() throws IOException {
+    public void start() throws IOException, InterruptedException {
         if (running.compareAndSet(false, true)) {
             final CountDownLatch latch = new CountDownLatch(1);
             selector = Selector.open();
@@ -117,15 +117,6 @@ public class NioServer extends AbstractServer {
             if (waitDone) {
                 latch.await();
             }
-        }
-    }
-
-    @Override
-    public void close() throws IOException {
-        try {
-            stop(true);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 }

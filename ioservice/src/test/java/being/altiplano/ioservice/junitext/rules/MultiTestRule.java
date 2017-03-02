@@ -1,4 +1,4 @@
-package being.altiplano.ioservice.junitext;
+package being.altiplano.ioservice.junitext.rules;
 
 
 import org.junit.internal.runners.statements.FailOnTimeout;
@@ -18,17 +18,15 @@ public class MultiTestRule implements TestRule {
     @Retention(RetentionPolicy.RUNTIME)
     @Target({java.lang.annotation.ElementType.METHOD, java.lang.annotation.ElementType.TYPE})
     public @interface Repeat {
+        //repeat times
         int value() default 1;
 
+        //timeout for each step
         long timeout() default 0L;
 
         boolean parallel() default false;
-    }
 
-    private final static boolean print;
-
-    static {
-        print = "true".equals(System.getProperty("repeat.print"));
+        boolean printStep() default false;
     }
 
     @Override
@@ -47,7 +45,7 @@ public class MultiTestRule implements TestRule {
                 result = new FailOnTimeout(result, timeout);
             }
             if (times > 1) {
-                result = new RepeatStatement(times, repeat.parallel(), result, methodName);
+                result = new RepeatStatement(repeat, result, methodName);
             }
         }
         return result;
@@ -57,12 +55,14 @@ public class MultiTestRule implements TestRule {
 
         private final int times;
         private final boolean parallel;
+        private final boolean printStep;
         private final Statement statement;
         private final String methodName;
 
-        private RepeatStatement(int times, boolean parallel, Statement statement, String methodName) {
-            this.times = times;
-            this.parallel = parallel;
+        private RepeatStatement(Repeat repeat, Statement statement, String methodName) {
+            this.times = repeat.value();
+            this.parallel = repeat.parallel();
+            this.printStep = repeat.printStep();
             this.statement = statement;
             this.methodName = methodName;
         }
@@ -77,19 +77,19 @@ public class MultiTestRule implements TestRule {
                 for (int i = 1; i <= times; i++) {
                     final int idx = i;
                     es.submit(() -> {
-                            try {
-                                if (anyError.compareAndSet(null, null)) {
-                                    if (print) {
-                                        System.out.println("Repeat(Parallel) " + methodName + ": " + idx + "/" + times);
+                                try {
+                                    if (anyError.compareAndSet(null, null)) {
+                                        if (printStep) {
+                                            System.out.println("Repeat(Parallel) " + methodName + ": " + idx + "/" + times);
+                                        }
+                                        statement.evaluate();
                                     }
-                                    statement.evaluate();
+                                } catch (Throwable throwable) {
+                                    anyError.compareAndSet(null, throwable);
+                                } finally {
+                                    done.countDown();
                                 }
-                            } catch (Throwable throwable) {
-                                anyError.compareAndSet(null, throwable);
-                            } finally {
-                                done.countDown();
                             }
-                        }
                     );
                 }
                 done.await();
@@ -100,7 +100,7 @@ public class MultiTestRule implements TestRule {
                 for (int i = 1; i <= times; i++) {
                     long lapsed = System.currentTimeMillis() - start;
                     long each = (i == 1 ? 0 : lapsed / (i - 1));
-                    if (print) {
+                    if (printStep) {
                         System.out.println("Repeat " + methodName + ": " + i + "/" + times + " elapsed(ms):" + lapsed + " each(ms):" + each);
                     }
                     statement.evaluate();
