@@ -3,7 +3,7 @@ package being.altiplano.config.replies;
 import being.altiplano.config.Command;
 
 /**
- * Created by gaoyuan on 21/02/2017.
+ * @see being.altiplano.config.commands.EchoCommand
  */
 public class EchoReply extends ContentReply {
     public EchoReply(String content) {

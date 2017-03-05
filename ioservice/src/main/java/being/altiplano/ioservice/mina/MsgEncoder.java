@@ -7,7 +7,7 @@ import org.apache.mina.filter.codec.ProtocolEncoderAdapter;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 
 /**
- * Created by gaoyuan on 27/02/2017.
+ * Msg Encoder
  */
 class MsgEncoder extends ProtocolEncoderAdapter {
     @Override

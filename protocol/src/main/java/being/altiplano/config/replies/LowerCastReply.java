@@ -3,7 +3,7 @@ package being.altiplano.config.replies;
 import being.altiplano.config.Command;
 
 /**
- * Created by gaoyuan on 21/02/2017.
+ * @see being.altiplano.config.commands.LowerCastCommand
  */
 public class LowerCastReply extends ContentReply {
     public LowerCastReply(String content) {

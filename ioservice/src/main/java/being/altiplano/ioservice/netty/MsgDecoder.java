@@ -8,7 +8,7 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import java.util.List;
 
 /**
- * Created by gaoyuan on 01/03/2017.
+ * Msg Decoder
  */
 class MsgDecoder extends ByteToMessageDecoder {
     private static class Pack {

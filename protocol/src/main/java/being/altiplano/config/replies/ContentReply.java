@@ -4,7 +4,7 @@ import being.altiplano.config.MsgConverter;
 import being.altiplano.config.Reply;
 
 /**
- * Created by gaoyuan on 22/02/2017.
+ * A Reply with content in string
  */
 abstract class ContentReply implements Reply {
     final String content;

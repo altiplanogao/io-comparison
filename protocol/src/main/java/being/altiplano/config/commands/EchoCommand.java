@@ -6,7 +6,11 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 
 /**
- * Created by gaoyuan on 21/02/2017.
+ * A request to do a echo operation to a string.
+ * Calling this command to the server will result in a {@link being.altiplano.config.replies.EchoReply} in return.
+ * Example: {"content":"abc.", "times":2} -> {"content":"abc.abc."}
+ *
+ * @see being.altiplano.config.replies.EchoReply
  */
 public class EchoCommand extends ContentCommand {
     public EchoCommand(byte[] data) {

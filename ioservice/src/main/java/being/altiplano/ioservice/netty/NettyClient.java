@@ -17,7 +17,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Created by gaoyuan on 01/03/2017.
+ * Implementation of {@link being.altiplano.ioservice.IClient} using Netty
  */
 public class NettyClient extends AbstractClient {
 
@@ -71,7 +71,7 @@ public class NettyClient extends AbstractClient {
     }
 
     @Override
-    public void disConnect() throws IOException, InterruptedException {
+    public void disconnect() throws IOException, InterruptedException {
         ChannelFuture cf = channel.close();
         Future wgf = workerGroup.shutdownGracefully();
         cf.await();

@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.net.Socket;
 
 /**
- * Created by gaoyuan on 21/02/2017.
+ * A connection with a client
  */
 class BioServerConnection implements IServerConnection, Closeable {
     private final Socket socket;

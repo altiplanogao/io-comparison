@@ -3,7 +3,10 @@ package being.altiplano.config.commands;
 import com.google.gson.Gson;
 
 /**
- * Created by gaoyuan on 21/02/2017.
+ * A request to start the connection.
+ * Calling this command to the server will result in a {@link being.altiplano.config.replies.StartReply} in return.
+ *
+ * @see being.altiplano.config.replies.StartReply
  */
 public class StartCommand extends ContentCommand {
     public StartCommand(byte[] data) {

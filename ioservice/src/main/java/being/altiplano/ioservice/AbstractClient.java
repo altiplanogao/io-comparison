@@ -21,7 +21,7 @@ public abstract class AbstractClient implements IClient {
 
     public final void close() throws IOException {
         try {
-            disConnect();
+            disconnect();
         } catch (InterruptedException e) {
             throw new IOException(e);
         }

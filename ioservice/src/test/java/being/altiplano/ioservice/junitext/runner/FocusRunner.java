@@ -12,9 +12,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.List;
 
-/**
- * Created by gaoyuan on 24/02/2017.
- */
 public class FocusRunner extends BlockJUnit4ClassRunner {
 
     @Retention(RetentionPolicy.RUNTIME)

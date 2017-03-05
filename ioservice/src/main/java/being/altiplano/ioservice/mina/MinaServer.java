@@ -18,7 +18,7 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.locks.LockSupport;
 
 /**
- * Created by gaoyuan on 26/02/2017.
+ * Implementation of {@link being.altiplano.ioservice.IServer} using Mina
  */
 public class MinaServer extends AbstractServer {
     private static final long START_TIMEOUT = 1000;

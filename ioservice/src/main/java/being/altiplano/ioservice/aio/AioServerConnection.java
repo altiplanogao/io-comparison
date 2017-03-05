@@ -9,7 +9,7 @@ import being.altiplano.ioservice.ServerCommandHandler;
 import java.nio.channels.AsynchronousSocketChannel;
 
 /**
- * Created by gaoyuan on 24/02/2017.
+ * A connection with a client
  */
 class AioServerConnection {
     private final AsynchronousSocketChannel channel;

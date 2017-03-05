@@ -10,9 +10,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
-/**
- * Created by gaoyuan on 25/02/2017.
- */
 class NioClientAccess implements IClientAccess {
     private SocketChannel channel;
     ByteBuffer r_header = ByteBuffer.allocate(8);

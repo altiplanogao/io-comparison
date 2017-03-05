@@ -18,7 +18,7 @@ import io.netty.util.concurrent.Future;
 import java.io.IOException;
 
 /**
- * Created by gaoyuan on 01/03/2017.
+ * Implementation of {@link being.altiplano.ioservice.IServer} using Mina
  */
 public class NettyServer extends AbstractServer {
     private volatile Channel serverChannel;

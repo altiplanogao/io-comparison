@@ -4,7 +4,7 @@ import being.altiplano.config.Command;
 import being.altiplano.config.MsgConverter;
 
 /**
- * Created by gaoyuan on 21/02/2017.
+ * A Command with not-null data
  */
 abstract class ContentCommand implements Command {
     protected final byte[] data;

@@ -5,7 +5,7 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 /**
- * Created by gaoyuan on 01/03/2017.
+ * Run Runnable before and after test
  */
 public class BeforeAndAfter implements TestRule {
     public interface Runnable {

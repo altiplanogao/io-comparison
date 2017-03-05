@@ -12,9 +12,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-/**
- * Created by gaoyuan on 22/02/2017.
- */
 class BioClientAccess implements IClientAccess, Closeable {
     private final Socket socket;
     private final DataInputStream input;
@@ -45,10 +42,8 @@ class BioClientAccess implements IClientAccess, Closeable {
     }
 
     public void close() throws IOException {
-        if (socket != null) {
-            socket.close();
-            input.close();
-            out.close();
-        }
+        socket.close();
+        input.close();
+        out.close();
     }
 }

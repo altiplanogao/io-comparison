@@ -6,11 +6,16 @@ import being.altiplano.config.replies.*;
 import java.io.UnsupportedEncodingException;
 
 /**
- * Created by gaoyuan on 21/02/2017.
+ * Convert {@link Msg} to {@link Command} or {@link Reply}
  */
 public class MsgConverter {
     public static final String ENCODING = "UTF-8";
 
+    /**
+     * Convert {@link Msg} to {@link Command}
+     * @param msg The {@link Msg}
+     * @return The result {@link Command}
+     */
     public static Command convert(Msg msg) {
         int code = msg.code;
         switch (code) {
@@ -33,6 +38,11 @@ public class MsgConverter {
         }
     }
 
+    /**
+     * Convert {@link Msg} to {@link Reply}
+     * @param msg The {@link Msg}
+     * @return The result {@link Reply}
+     */
     public static Reply convertReply(Msg msg) {
         int code = msg.code;
         switch (code) {

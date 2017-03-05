@@ -5,9 +5,6 @@ import org.apache.mina.filter.codec.ProtocolCodecFactory;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 
-/**
- * Created by gaoyuan on 27/02/2017.
- */
 class MsgCodecFactory implements ProtocolCodecFactory {
 
     private final MsgDecoder msgDecoder = new MsgDecoder();

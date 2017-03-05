@@ -14,7 +14,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
- * Created by gaoyuan on 23/02/2017.
+ * Implementation of {@link being.altiplano.ioservice.IClient} using AIO
  */
 public class AioClient extends AbstractClient {
 
@@ -68,7 +68,7 @@ public class AioClient extends AbstractClient {
     }
 
     @Override
-    public void disConnect() throws IOException, InterruptedException {
+    public void disconnect() throws IOException, InterruptedException {
         if (socketChannel != null) {
             socketChannel.close();
             socketChannel = null;

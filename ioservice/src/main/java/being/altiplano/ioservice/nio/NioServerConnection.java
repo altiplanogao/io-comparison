@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
 /**
- * Created by gaoyuan on 24/02/2017.
+ * A connection with a client
  */
 class NioServerConnection implements IServerConnection {
     private final SocketChannel channel;

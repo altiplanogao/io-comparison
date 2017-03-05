@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Created by gaoyuan on 20/02/2017.
+ * Implementation of {@link being.altiplano.ioservice.IServer} using BIO
  */
 public class BioServer extends AbstractServer {
     private ExecutorService executorService;

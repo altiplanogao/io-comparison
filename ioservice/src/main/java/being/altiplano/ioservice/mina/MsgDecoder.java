@@ -7,7 +7,7 @@ import org.apache.mina.filter.codec.CumulativeProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
- * Created by gaoyuan on 28/02/2017.
+ * Msg Decoder
  */
 class MsgDecoder extends CumulativeProtocolDecoder {
 

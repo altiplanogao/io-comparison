@@ -12,7 +12,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Created by gaoyuan on 23/02/2017.
+ * Implementation of {@link being.altiplano.ioservice.IServer} using AIO
  */
 public class AioServer extends AbstractServer {
     private AsynchronousServerSocketChannel serverSocketChannel;

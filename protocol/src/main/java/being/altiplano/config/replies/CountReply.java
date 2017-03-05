@@ -6,7 +6,7 @@ import being.altiplano.config.Reply;
 import java.nio.ByteBuffer;
 
 /**
- * Created by gaoyuan on 21/02/2017.
+ * @see being.altiplano.config.commands.CountCommand
  */
 public class CountReply implements Reply {
     private final int count;

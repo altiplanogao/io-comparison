@@ -10,9 +10,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * Created by gaoyuan on 02/03/2017.
- */
 public class OrderedRunner extends BlockJUnit4ClassRunner {
     @Retention(RetentionPolicy.RUNTIME)
     public @interface Order {

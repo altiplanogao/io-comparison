@@ -4,7 +4,7 @@ import being.altiplano.config.Msg;
 import org.apache.mina.core.buffer.IoBuffer;
 
 /**
- * Created by gaoyuan on 04/03/2017.
+ * Stateful msg information gather.
  */
 class Pack {
     boolean headDone = false;

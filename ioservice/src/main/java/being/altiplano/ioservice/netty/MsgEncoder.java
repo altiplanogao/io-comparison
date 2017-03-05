@@ -6,7 +6,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
 /**
- * Created by gaoyuan on 01/03/2017.
+ * Msg Encoder
  */
 class MsgEncoder extends MessageToByteEncoder<Msg> {
     @Override

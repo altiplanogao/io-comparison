@@ -8,7 +8,7 @@ import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
 
 /**
- * Created by gaoyuan on 23/02/2017.
+ * Implementation of {@link being.altiplano.ioservice.IClient} using NIO
  */
 public class NioClient extends ConnectionClient {
     private SocketChannel socketChannel;

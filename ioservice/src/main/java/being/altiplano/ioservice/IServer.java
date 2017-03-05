@@ -4,7 +4,7 @@ import java.io.Closeable;
 import java.io.IOException;
 
 /**
- * Created by gaoyuan on 23/02/2017.
+ * A socket server
  */
 public interface IServer extends Closeable {
     void start() throws IOException, InterruptedException;

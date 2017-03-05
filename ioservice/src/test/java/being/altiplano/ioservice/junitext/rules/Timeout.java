@@ -6,7 +6,7 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 /**
- * Created by gaoyuan on 01/03/2017.
+ * A Timeout Rule which will be disabled on maven-debugging
  */
 public class Timeout implements TestRule {
     private final int fMillis;

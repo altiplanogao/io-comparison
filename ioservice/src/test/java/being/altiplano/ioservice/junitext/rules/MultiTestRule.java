@@ -14,6 +14,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ *
+ */
 public class MultiTestRule implements TestRule {
     @Retention(RetentionPolicy.RUNTIME)
     @Target({java.lang.annotation.ElementType.METHOD, java.lang.annotation.ElementType.TYPE})

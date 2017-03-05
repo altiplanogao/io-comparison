@@ -1,13 +1,13 @@
-package being.altiplano.ioservice.utils;
+package being.altiplano.ioservice.nio;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
 /**
- * Created by gaoyuan on 24/02/2017.
+ * Helper class of SocketChannel
  */
-public class BufferUtils {
+class BufferUtils {
     public static byte[] readChannel(SocketChannel channel,
                                      ByteBuffer buffer, final int requires)
             throws IOException {

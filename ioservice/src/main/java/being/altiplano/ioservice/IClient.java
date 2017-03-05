@@ -7,12 +7,34 @@ import java.io.Closeable;
 import java.io.IOException;
 
 /**
- * Created by gaoyuan on 23/02/2017.
+ * A socket client
+ * IClient provide functions:
+ * 1. connect
+ * 2. disconnect
+ * also a list of command-and-reply methods:
+ * 1. start
+ * 2. stop
+ * 3. echo
+ * 4. count
+ * 5. reverse
+ * 6. lower-cast
+ * 7. upper-cast
  */
 public interface IClient extends Closeable {
+    /**
+     * Publish a connection.
+     * @throws IOException
+     * @throws InterruptedException
+     */
     void connect() throws IOException, InterruptedException;
 
-    void disConnect() throws IOException, InterruptedException;
+    /**
+     * Disconnect
+     *
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    void disconnect() throws IOException, InterruptedException;
 
     StartReply call(StartCommand command) throws IOException;
 

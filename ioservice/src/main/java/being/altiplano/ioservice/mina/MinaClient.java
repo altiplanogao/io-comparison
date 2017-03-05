@@ -21,7 +21,7 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.locks.LockSupport;
 
 /**
- * Created by gaoyuan on //.
+ * Implementation of {@link being.altiplano.ioservice.IClient} using Mina
  */
 public class MinaClient extends AbstractClient {
     private static final int CONNECT_TIMEOUT = 0_0;
@@ -77,7 +77,7 @@ public class MinaClient extends AbstractClient {
     }
 
     @Override
-    public void disConnect() throws IOException {
+    public void disconnect() throws IOException {
         session.closeNow().awaitUninterruptibly();
         connector.dispose(true);
     }

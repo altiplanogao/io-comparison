@@ -7,7 +7,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 /**
- * Created by gaoyuan on 24/02/2017.
+ * Helper class
  */
 class BioStreamHelper {
     public static void write(DataOutputStream out, int code, byte[] data) throws IOException {

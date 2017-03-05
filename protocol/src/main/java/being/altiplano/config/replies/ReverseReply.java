@@ -3,7 +3,7 @@ package being.altiplano.config.replies;
 import being.altiplano.config.Command;
 
 /**
- * Created by gaoyuan on 21/02/2017.
+ * @see being.altiplano.config.commands.ReverseCommand
  */
 public class ReverseReply extends ContentReply {
     public ReverseReply(String content) {

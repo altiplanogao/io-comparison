@@ -7,7 +7,7 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 
 /**
- * Created by gaoyuan on 26/02/2017.
+ * MsgReader, read {@link Msg} out from {@link AsynchronousSocketChannel}
  */
 class MsgReader {
     static final int bufferSize = 16; //must > 8

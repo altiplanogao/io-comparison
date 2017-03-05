@@ -22,9 +22,6 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.LockSupport;
 
-/**
- * Created by gaoyuan on 22/02/2017.
- */
 @MultiTestRule.Repeat(value = 2, timeout = ServerClientTest.EACH_TIMEOUT, printStep = true)
 public class ServerClientTest extends ServerClientTestBase {
 

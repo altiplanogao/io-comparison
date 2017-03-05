@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.net.Socket;
 
 /**
- * Created by gaoyuan on 22/02/2017.
+ * Implementation of {@link being.altiplano.ioservice.IClient} using BIO
  */
 public class BioClient extends ConnectionClient {
     private volatile Socket socket;

@@ -5,9 +5,6 @@ import being.altiplano.config.Reply;
 
 import java.io.IOException;
 
-/**
- * Created by gaoyuan on 24/02/2017.
- */
 public interface IServerConnection {
     Command readCommand() throws IOException;
 

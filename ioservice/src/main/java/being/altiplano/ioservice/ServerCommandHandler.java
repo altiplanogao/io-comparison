@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
 /**
- * Created by gaoyuan on 24/02/2017.
+ * Translate {@link Command} to {@link Reply}
  */
 public class ServerCommandHandler {
     private final Gson gson;

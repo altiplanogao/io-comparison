@@ -14,9 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Created by gaoyuan on 22/02/2017.
- */
 public class ServerClientTestBase {
     @Rule
     public ErrorCollector collector = new ErrorCollector();
@@ -132,7 +129,7 @@ public class ServerClientTestBase {
     protected void closeClient(IClient client) throws IOException {
         checkStop(client);
         try {
-            client.disConnect();
+            client.disconnect();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

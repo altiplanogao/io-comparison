@@ -27,7 +27,7 @@ public abstract class ConnectionClient extends AbstractClient {
     protected abstract IClientAccess createAccess() throws IOException;
 
     @Override
-    public final void disConnect() throws IOException, InterruptedException {
+    public final void disconnect() throws IOException, InterruptedException {
         clientAccess = null;
         doDisConnect();
     }

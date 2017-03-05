@@ -10,9 +10,8 @@ import java.io.IOException;
 import java.net.Socket;
 
 /**
- * Created by gaoyuan on 20/02/2017.
+ * A connection with a client
  */
-
 class ServerConnectionRunnable implements Runnable {
     private final Socket socket;
     private final ServerCommandHandler commandHandler = new ServerCommandHandler();

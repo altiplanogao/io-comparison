@@ -7,7 +7,7 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 
 /**
- * Created by gaoyuan on 26/02/2017.
+ * Write {@link Msg} to {@link AsynchronousSocketChannel}.
  */
 class MsgWriter {
     static final int bufferSize = 16; //must > 8
