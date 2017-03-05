@@ -25,6 +25,7 @@ public class PrintEntrance implements TestRule {
         return new Statement() {
             @Override
             public void evaluate() throws Throwable {
+                long startTime = System.currentTimeMillis();
                 try {
                     if (printPre) {
                         System.out.println("Enter -->> " + description.getTestClass() + "#" + description.getMethodName());
@@ -32,7 +33,8 @@ public class PrintEntrance implements TestRule {
                     statement.evaluate();
                 } finally {
                     if (printPost) {
-                        System.out.println("Leave -->> " + description.getMethodName());
+                        long finishTime = System.currentTimeMillis() - startTime;
+                        System.out.println("Leave -->> " + description.getMethodName() + ", elapsed(ms): " + finishTime);
                     }
                 }
             }

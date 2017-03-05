@@ -95,7 +95,8 @@ public class NioServer extends AbstractServer {
             };
             connectionLatch = latch;
             serverSocketChannel = ssc;
-            new Thread(selectRunnable).start();
+            //es.submit(selectRunnable);
+            (new Thread(selectRunnable)).start();
         }
     }
 

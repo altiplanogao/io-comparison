@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Created by gaoyuan on 20/02/2017.
  */
 public class BioServer extends AbstractServer {
-    private final ExecutorService executorService;
+    private ExecutorService executorService;
     private volatile ServerSocket serverSocket;
     private final AtomicBoolean running = new AtomicBoolean(false);
     private CountDownLatch connectionLatch;
@@ -22,20 +22,19 @@ public class BioServer extends AbstractServer {
     public BioServer(int port) {
         super(port);
         serverSocket = null;
-        int cpu = Runtime.getRuntime().availableProcessors();
-        executorService = Executors.newFixedThreadPool(cpu * 8);
     }
 
     @Override
     public void start() throws IOException, InterruptedException {
         if (running.compareAndSet(false, true)) {
+            int cpu = Runtime.getRuntime().availableProcessors();
+            executorService = Executors.newFixedThreadPool(cpu * 8);
             final ServerSocket ss = new ServerSocket(port);
             final CountDownLatch latch = new CountDownLatch(1);
 
             Runnable acceptConnectionRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    Thread.currentThread().setName("BioServerAccept");
                     try {
                         while (running.get()) {
                             try {
@@ -69,6 +68,8 @@ public class BioServer extends AbstractServer {
             if (waitDone) {
                 latch.await();
             }
+            executorService.shutdown();
+            executorService = null;
         }
     }
 

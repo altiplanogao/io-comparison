@@ -129,7 +129,7 @@ public class ServerClientTestBase {
         }
     }
 
-    protected void closeSocketClient(IClient client) throws IOException {
+    protected void closeClient(IClient client) throws IOException {
         checkStop(client);
         try {
             client.disConnect();

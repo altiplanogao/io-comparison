@@ -26,14 +26,19 @@ class NioClientAccess implements IClientAccess {
 
     @Override
     public Reply readReply() throws IOException {
-        Msg msg = NioChannelHelper.readMsg(channel, r_header, r_body);
+        Msg msg;
+        synchronized (channel) {
+            msg = NioChannelHelper.readMsg(channel, r_header, r_body);
+        }
         return MsgConverter.convertReply(msg);
     }
 
     @Override
-    public void writeCommand(Command cmd) throws IOException {
+    public void writeCommand(final Command cmd) throws IOException {
         int code = cmd.code();
         byte[] data = cmd.toBytes();
-        NioChannelHelper.writeMsg(channel, w_header, w_body, code, data);
+        synchronized (channel) {
+            NioChannelHelper.writeMsg(channel, w_header, w_body, code, data);
+        }
     }
 }

@@ -14,11 +14,11 @@ class MsgEncoder extends ProtocolEncoderAdapter {
     public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
         if (message instanceof Msg) {
             Msg msg = (Msg) message;
-            IoBuffer buffer = IoBuffer.allocate(msg.length + 8)
+            IoBuffer buffer = IoBuffer.allocate(msg.length + 8, false)
                     .putInt(msg.code)
                     .putInt(msg.length)
                     .put(msg.data).flip();
-            session.write(buffer);
+            out.write(buffer);
         }
     }
 }

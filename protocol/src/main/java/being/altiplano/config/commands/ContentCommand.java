@@ -7,7 +7,7 @@ import being.altiplano.config.MsgConverter;
  * Created by gaoyuan on 21/02/2017.
  */
 abstract class ContentCommand implements Command {
-    protected byte[] data;
+    protected final byte[] data;
 
     public ContentCommand(byte[] data) {
         this.data = data;

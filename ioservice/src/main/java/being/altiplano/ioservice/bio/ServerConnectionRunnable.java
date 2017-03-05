@@ -17,11 +17,6 @@ class ServerConnectionRunnable implements Runnable {
     private final Socket socket;
     private final ServerCommandHandler commandHandler = new ServerCommandHandler();
 
-    private void log(String content) {
-        System.out.println("    Server " + content);
-    }
-
-
     public ServerConnectionRunnable(Socket client) {
         socket = client;
     }

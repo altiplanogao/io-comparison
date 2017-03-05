@@ -74,7 +74,7 @@ public class NettyClient extends AbstractClient {
     public void disConnect() throws IOException, InterruptedException {
         ChannelFuture cf = channel.close();
         Future wgf = workerGroup.shutdownGracefully();
-        cf.sync();
+        cf.await();
         wgf.await();
     }
 

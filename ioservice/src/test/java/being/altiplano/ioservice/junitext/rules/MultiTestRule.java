@@ -29,6 +29,19 @@ public class MultiTestRule implements TestRule {
         boolean printStep() default false;
     }
 
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({java.lang.annotation.ElementType.METHOD})
+    public @interface TimeoutOverride {
+        //timeout for each step
+        long value() default 0L;
+
+        int times() default 1;
+    }
+
+    private boolean enableTimeout() {
+        return !"true".equals(System.getProperty("maven.surefire.debug"));
+    }
+
     @Override
     public Statement apply(Statement statement, Description description) {
         Statement result = statement;
@@ -41,7 +54,14 @@ public class MultiTestRule implements TestRule {
         if (repeat != null) {
             int times = repeat.value();
             long timeout = repeat.timeout();
-            if (timeout > 0) {
+            TimeoutOverride timeoutOverride = description.getAnnotation(TimeoutOverride.class);
+            if (timeoutOverride != null) {
+                if (timeoutOverride.value() > 0) {
+                    timeout = timeoutOverride.value();
+                }
+                timeout *= timeoutOverride.times();
+            }
+            if (timeout > 0 && enableTimeout()) {
                 result = new FailOnTimeout(result, timeout);
             }
             if (times > 1) {
@@ -71,30 +91,34 @@ public class MultiTestRule implements TestRule {
         public void evaluate() throws Throwable {
             long start = System.currentTimeMillis();
             if (parallel) {
-                CountDownLatch done = new CountDownLatch(times);
-                ExecutorService es = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+                final CountDownLatch done = new CountDownLatch(times);
+                final ExecutorService es = Executors.newCachedThreadPool();
                 final AtomicReference<Throwable> anyError = new AtomicReference<>(null);
-                for (int i = 1; i <= times; i++) {
-                    final int idx = i;
-                    es.submit(() -> {
-                                try {
-                                    if (anyError.compareAndSet(null, null)) {
-                                        if (printStep) {
-                                            System.out.println("Repeat(Parallel) " + methodName + ": " + idx + "/" + times);
+                try {
+                    for (int i = 1; i <= times; i++) {
+                        final int idx = i;
+                        es.submit(() -> {
+                                    try {
+                                        if (anyError.compareAndSet(null, null)) {
+                                            if (printStep) {
+                                                System.out.println("Repeat(Parallel) " + methodName + ": " + idx + "/" + times);
+                                            }
+                                            statement.evaluate();
                                         }
-                                        statement.evaluate();
+                                    } catch (Throwable throwable) {
+                                        anyError.compareAndSet(null, throwable);
+                                    } finally {
+                                        done.countDown();
                                     }
-                                } catch (Throwable throwable) {
-                                    anyError.compareAndSet(null, throwable);
-                                } finally {
-                                    done.countDown();
                                 }
-                            }
-                    );
-                }
-                done.await();
-                if (!anyError.compareAndSet(null, null)) {
-                    throw anyError.get();
+                        );
+                    }
+                    done.await();
+                    if (!anyError.compareAndSet(null, null)) {
+                        throw anyError.get();
+                    }
+                } finally {
+                    es.shutdown();
                 }
             } else {
                 for (int i = 1; i <= times; i++) {

@@ -37,9 +37,9 @@ class BioClientAccess implements IClientAccess, Closeable {
 
     @Override
     public void writeCommand(Command cmd) throws IOException {
+        int code = cmd.code();
+        byte[] data = cmd.toBytes();
         synchronized (out) {
-            int code = cmd.code();
-            byte[] data = cmd.toBytes();
             BioStreamHelper.write(out, code, data);
         }
     }

@@ -13,10 +13,9 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.util.concurrent.Future;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 /**
  * Created by gaoyuan on 01/03/2017.
@@ -80,21 +79,16 @@ public class NettyServer extends AbstractServer {
     @Override
     public void stop(boolean waitDone) throws IOException, InterruptedException {
         ChannelFuture closeFuture = serverChannel.close();
+        Future bsf = bossGroup.shutdownGracefully();
+        Future wsf = workerGroup.shutdownGracefully();
         if (waitDone) {
             try {
-                Future bsf = bossGroup.shutdownGracefully();
-                Future wsf = workerGroup.shutdownGracefully();
-
                 closeFuture.await();
-                bsf.get();
-                wsf.get();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
+                bsf.await();
+                wsf.await();
             } finally {
 
             }
         }
-
     }
-
 }
