@@ -5,19 +5,16 @@ import java.io.IOException;
 import java.util.function.Function;
 
 public abstract class Client<REQUEST, RESPONSE> implements Closeable {
-    protected final String address;
-    protected final int port;
-    protected final Class<REQUEST> requestDataType;
+    private final Class<REQUEST> requestDataType;
     private final Function<REQUEST, byte[]> requestSerializer;
-    protected final Class<RESPONSE> responseDataType;
-    protected final Function<byte[], RESPONSE> responseDeserializer;
+
+    private final Class<RESPONSE> responseDataType;
+    private final Function<byte[], RESPONSE> responseDeserializer;
+
     private final Listenable<RESPONSE> responseListenable = new Listenable<>();
 
-    public Client(String address, int port,
-                  Class<REQUEST> requestDataType, Function<REQUEST, byte[]> requestSerializer,
+    public Client(Class<REQUEST> requestDataType, Function<REQUEST, byte[]> requestSerializer,
                   Class<RESPONSE> responseDataType, Function<byte[], RESPONSE> responseDeserializer) {
-        this.address = address;
-        this.port = port;
         this.requestDataType = requestDataType;
         this.requestSerializer = requestSerializer;
         this.responseDataType = responseDataType;
@@ -42,6 +39,11 @@ public abstract class Client<REQUEST, RESPONSE> implements Closeable {
     }
 
     protected abstract void rawRequest(byte[] req);
+
+    protected void onReceiveRawResponse(byte[] rawResponse){
+        RESPONSE response = responseDeserializer.apply(rawResponse);
+        responseListenable.fire(response);
+    }
 
     public Listenable<RESPONSE> getResponseListenable(){
         return responseListenable;
