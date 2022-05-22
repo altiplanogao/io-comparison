@@ -35,13 +35,10 @@ public abstract class ConnectionClient extends AbstractClient {
     protected abstract void doDisConnect() throws IOException, InterruptedException;
 
     protected <T extends Reply> T writeAndRead(Command command) throws IOException {
-        try {
-            synchronized (clientAccess) {
-                clientAccess.writeCommand(command);
-                Reply reply = clientAccess.readReply();
-                return (T) reply;
-            }
-        } finally {
+        synchronized (clientAccess) {
+            clientAccess.writeCommand(command);
+            Reply reply = clientAccess.readReply();
+            return (T) reply;
         }
     }
 }

@@ -34,63 +34,62 @@ public class NioServer extends AbstractServer {
     @Override
     public void start() throws IOException, InterruptedException {
         if (running.compareAndSet(false, true)) {
-            final CountDownLatch latch = new CountDownLatch(1);
-            selector = Selector.open();
-
             final ServerSocketChannel ssc = ServerSocketChannel.open();
             ssc.configureBlocking(false);
             ssc.socket().bind(new InetSocketAddress(port));
 
+            selector = Selector.open();
             SelectionKey key = ssc.register(selector, SelectionKey.OP_ACCEPT);
 
-            Runnable selectRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        while (running.get()) {
-                            try {
-                                int num = selector.select();
+            final CountDownLatch latch = new CountDownLatch(1);
+            Runnable selectRunnable = () -> {
+                try {
+                    while (running.get()) {
+                        try {
+                            int num = selector.select();
 
-                                Set<SelectionKey> selectedKeys = selector.selectedKeys();
-                                Iterator<SelectionKey> keyIterator = selectedKeys.iterator();
-                                while (keyIterator.hasNext()) {
-                                    try {
-                                        SelectionKey key = keyIterator.next();
-                                        Object attachment = key.attachment();
-                                        if (key.isAcceptable()) {
-                                            // a connection was accepted by a ServerSocketChannel.
-                                            SocketChannel socketChannel = ssc.accept();
-                                            socketChannel.configureBlocking(false);
-                                            NioServerConnection connection = new NioServerConnection(socketChannel);
-                                            socketChannel.register(selector,
-                                                    SelectionKey.OP_CONNECT | SelectionKey.OP_READ,
-                                                    //  | SelectionKey.OP_WRITE,
-                                                    connection);
-                                        } else if (key.isConnectable()) {
-                                            NioServerConnection connection = (NioServerConnection) attachment;
-                                        } else if (key.isReadable()) {
-                                            NioServerConnection connection = (NioServerConnection) attachment;
-                                            Command command = connection.readCommand();
-                                            Reply reply = processCommand(connection, command);
-                                            if (reply instanceof StopReply) {
-                                                key.channel().close();
-                                            }
-                                        } else if (key.isWritable()) {
-                                            NioServerConnection connection = (NioServerConnection) attachment;
+                            Set<SelectionKey> selectedKeys = selector.selectedKeys();
+                            Iterator<SelectionKey> keyIterator = selectedKeys.iterator();
+                            while (keyIterator.hasNext()) {
+                                try {
+                                    SelectionKey key1 = keyIterator.next();
+                                    Object attachment = key1.attachment();
+                                    if (key1.isAcceptable()) {
+                                        // The connection was accepted by a ServerSocketChannel.
+                                        SocketChannel socketChannel = ssc.accept();
+                                        socketChannel.configureBlocking(false);
+                                        NioServerConnection connection = new NioServerConnection(socketChannel);
+                                        socketChannel.register(selector,
+                                                SelectionKey.OP_CONNECT | SelectionKey.OP_READ,
+                                                //  | SelectionKey.OP_WRITE,
+                                                connection);
+                                    } else if (key1.isConnectable()) {
+                                        // The connection was established with a remote server.
+                                        NioServerConnection connection = (NioServerConnection) attachment;
+                                    } else if (key1.isReadable()) {
+                                        // The channel is ready for reading
+                                        NioServerConnection connection = (NioServerConnection) attachment;
+                                        Command command = connection.readCommand();
+                                        Reply reply = processCommand(connection, command);
+                                        if (reply instanceof StopReply) {
+                                            key1.channel().close();
                                         }
-                                    } finally {
-                                        keyIterator.remove();
+                                    } else if (key1.isWritable()) {
+                                        //  The channel is ready for writing
+                                        NioServerConnection connection = (NioServerConnection) attachment;
                                     }
-                                }
-                            } catch (IOException e) {
-                                if (running.get()) {
-                                    e.printStackTrace();
+                                } finally {
+                                    keyIterator.remove();
                                 }
                             }
+                        } catch (IOException e) {
+                            if (running.get()) {
+                                e.printStackTrace();
+                            }
                         }
-                    } finally {
-                        latch.countDown();
                     }
+                } finally {
+                    latch.countDown();
                 }
             };
             connectionLatch = latch;

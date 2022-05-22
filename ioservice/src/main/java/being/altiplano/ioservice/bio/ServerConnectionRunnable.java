@@ -39,7 +39,6 @@ class ServerConnectionRunnable implements Runnable {
             }
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
         }
     }
 }

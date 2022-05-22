@@ -50,21 +50,21 @@ public class NettyClient extends AbstractClient {
         workerGroup = new NioEventLoopGroup();
 
         Bootstrap b = new Bootstrap();
-        b.group(workerGroup);
-        b.channel(NioSocketChannel.class);
-        b.option(ChannelOption.SO_KEEPALIVE, true);
-        b.handler(new ChannelInitializer<SocketChannel>() {
-            @Override
-            protected void initChannel(SocketChannel ch) throws Exception {
-                ChannelPipeline p = ch.pipeline();
-                p.addLast(
-                        //new LoggingHandler(LogLevel.INFO),
-                        new MsgEncoder(),
-                        new MsgDecoder(),
-                        new NettyClientHandler()
-                );
-            }
-        });
+        b.group(workerGroup)
+                .channel(NioSocketChannel.class)
+                .option(ChannelOption.SO_KEEPALIVE, true)
+                .handler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    protected void initChannel(SocketChannel ch) throws Exception {
+                        ChannelPipeline p = ch.pipeline();
+                        p.addLast(
+                                //new LoggingHandler(LogLevel.INFO),
+                                new MsgEncoder(),
+                                new MsgDecoder(),
+                                new NettyClientHandler()
+                        );
+                    }
+                });
 
         ChannelFuture f = b.connect(address, port).sync();
         channel = f.channel();
