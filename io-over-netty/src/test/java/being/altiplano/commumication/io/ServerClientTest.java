@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @Disabled
 class ServerClientTest {
+    int port = 9999;
     private int magic = 0x11223344;
     private int frameSize = 1024;
 
@@ -28,12 +29,11 @@ class ServerClientTest {
 
     @Test
     public void simpleTest() throws InterruptedException, IOException {
-        int port = 9999;
-
         try (Server<MRequest, MResponse> server = createServer(port);
              Client<MRequest, MResponse> client = createClient(port)){
             server.start();
             client.start();
+
             CountDownLatch waitResponse = new CountDownLatch(1);
             AtomicReference<MResponse> responseHolder = new AtomicReference<>();
             client.registerResponseListener(event -> {
