@@ -9,10 +9,14 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.Future;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 class RawClient implements Client<byte[], byte[]> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RawClient.class);
+
     private final AtomicBoolean connected = new AtomicBoolean(false);
 
     protected final String address;
@@ -52,21 +56,23 @@ class RawClient implements Client<byte[], byte[]> {
     private ChannelInitializer<SocketChannel> createChannelInitializer() {
         return new ChannelInitializer<SocketChannel>() {
             @Override
-            protected void initChannel(SocketChannel ch) throws Exception {
+            protected void initChannel(SocketChannel ch) {
                 ChannelPipeline p = ch.pipeline();
-                p.addLast(
-                        //new LoggingHandler(LogLevel.INFO),
-                        new ByteToFrameDecoder(frameSize), // inbound (response: bytes stream -> frame)
-                        new FrameToBlockDecoder(magic), // inbound (response: frame -> block)
-                        new BlockToRawObjectDecoder() {
-                            @Override
-                            protected void onReceiveData(ChannelHandlerContext ctx, byte[] rawResponse) {
-                                onReceiveRawResponse(ctx, rawResponse);
-                            }
-                        }, // inbound (response: block -> raw response bytes)
-                        new BlockToByteEncoder(magic, frameSize) // outbound (request: block -> frame -> bytes stream)
-                );
+                p.addLast(getChannelInitialHandlers());
             }
+        };
+    }
+
+    private ChannelHandler[] getChannelInitialHandlers(){
+        return new ChannelHandler[]{
+                //new LoggingHandler(LogLevel.INFO),
+                new ByteStreamToFrameDecoder(frameSize).setLogPrefix("client got response"), // inbound (response: bytes stream -> frame)
+                new FramesToBlockDecoder(magic).setLogPrefix("client got response"), // inbound (response: frame -> block)
+                new BlockToRawObjectDecoder(this::onReceiveRawResponse).setLogPrefix("client got response"), // inbound (response: block -> raw bytes)
+
+//                new SliceToFramesEncoder(magic,frameSize).setLogPrefix("client send request"),
+//                new FrameToByteStreamEncoder().setLogPrefix("client send request"),
+                new SliceToByteStreamEncoder(magic, frameSize).setLogPrefix("client send request") // outbound (request: block -> frame -> bytes stream)
         };
     }
 
@@ -82,7 +88,8 @@ class RawClient implements Client<byte[], byte[]> {
 
     @Override
     public void request(byte[] bytesOfRequest) {
-        channel.writeAndFlush(bytesOfRequest);
+        LOGGER.info("make request");
+        channel.writeAndFlush(new Slice(bytesOfRequest));
     }
 
     @Override

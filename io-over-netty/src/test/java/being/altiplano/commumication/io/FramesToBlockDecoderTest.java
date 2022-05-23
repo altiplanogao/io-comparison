@@ -8,12 +8,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-class FrameToBlockDecoderTest {
+class FramesToBlockDecoderTest {
     private final int magic = 0x12345678;
 
     @Test
     public void testDecodeNotFinish() {
-        EmbeddedChannel channel = new EmbeddedChannel(new FrameToBlockDecoder(magic));
+        EmbeddedChannel channel = new EmbeddedChannel(new FramesToBlockDecoder(magic));
 
         Frame data0 = new Frame(magic, (byte) 0b10000000, "Hello World".getBytes(StandardCharsets.UTF_8));
         Assertions.assertFalse(channel.writeInbound(data0));
@@ -26,7 +26,7 @@ class FrameToBlockDecoderTest {
 
     @Test
     public void testDecodeOnce() {
-        EmbeddedChannel channel = new EmbeddedChannel(new FrameToBlockDecoder(magic));
+        EmbeddedChannel channel = new EmbeddedChannel(new FramesToBlockDecoder(magic));
 
         Frame data0 = new Frame(magic, (byte) 0b11000000, "Hello World".getBytes(StandardCharsets.UTF_8));
         channel.writeInbound(data0);
@@ -40,7 +40,7 @@ class FrameToBlockDecoderTest {
 
     @Test
     public void testDecodeWith2Frame() {
-        EmbeddedChannel channel = new EmbeddedChannel(new FrameToBlockDecoder(magic));
+        EmbeddedChannel channel = new EmbeddedChannel(new FramesToBlockDecoder(magic));
 
         Frame data0 = new Frame(magic, (byte) 0b10000000, "ABC".getBytes(StandardCharsets.UTF_8));
         Assertions.assertFalse(channel.writeInbound(data0));
@@ -85,7 +85,7 @@ class FrameToBlockDecoderTest {
     }
 
     private void givenAndExpects(Frame[] given, String... expects) {
-        EmbeddedChannel channel = new EmbeddedChannel(new FrameToBlockDecoder(magic));
+        EmbeddedChannel channel = new EmbeddedChannel(new FramesToBlockDecoder(magic));
 
         for (Frame frame : given) {
             channel.writeInbound(frame);

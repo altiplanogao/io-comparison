@@ -1,38 +1,42 @@
 package being.altiplano.commumication.protocol;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class GenericServer<REQUEST, RESPONSE> extends Server<REQUEST, RESPONSE> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GenericServer.class);
+
     private final Server<byte[], byte[]> innerServer;
 
-    private final Class<REQUEST> requestDataType;
-    private final Function<byte[], REQUEST> requestDeserializer;
+    private final Deserializer<REQUEST> requestDeserializer;
 
-    private final Class<RESPONSE> responseDataType;
-    private final Function<RESPONSE, byte[]> responseSerializer;
+    private final Serializer<RESPONSE> responseSerializer;
 
     public GenericServer(Supplier<Server<byte[], byte[]>> innerServerSupplier,
-                         Class<REQUEST> requestDataType, Function<byte[], REQUEST> requestDeserializer,
-                         Class<RESPONSE> responseDataType, Function<RESPONSE, byte[]> responseSerializer) {
+                         Deserializer<REQUEST> requestDeserializer,
+                         Serializer<RESPONSE> responseSerializer) {
         super();
         this.innerServer = innerServerSupplier.get();
-        this.requestDataType = requestDataType;
         this.requestDeserializer = requestDeserializer;
-        this.responseDataType = responseDataType;
         this.responseSerializer = responseSerializer;
     }
 
     @Override
-    public void setProcessor(final Function<REQUEST, RESPONSE> processor) {
+    public Server<REQUEST, RESPONSE> setProcessor(final Function<REQUEST, RESPONSE> processor) {
         super.setProcessor(processor);
         Function<byte[], byte[]> innerProcessor = requestBytes -> {
-            REQUEST req = requestDeserializer.apply(requestBytes);
+            REQUEST req = requestDeserializer.deserialize(requestBytes);
+            LOGGER.info("server: got request");
             RESPONSE res = processRequest(req);
-            byte[] resBytes = responseSerializer.apply(res);
+            LOGGER.info("server: response prepared");
+            byte[] resBytes = responseSerializer.serialize(res);
             return resBytes;
         };
         this.innerServer.setProcessor(innerProcessor);
+        return this;
     }
 
     public void start() throws InterruptedException {
@@ -42,14 +46,4 @@ public class GenericServer<REQUEST, RESPONSE> extends Server<REQUEST, RESPONSE> 
     public void stop(boolean waitDone) throws InterruptedException {
         innerServer.stop(waitDone);
     }
-
-    //
-//    protected final void onReceiveRawRequest(ChannelHandlerContext ctx, byte[] rawRequest){
-//        REQUEST request = requestDeserializer.apply(rawRequest);
-//        requestListenable.fire(request);
-//        //不太合理
-//        RESPONSE response = requestHandler.apply(request);
-//        responseListenable.fire(response);
-//        ctx.write(response);
-//    }
 }

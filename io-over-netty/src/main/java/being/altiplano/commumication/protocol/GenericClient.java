@@ -1,17 +1,20 @@
 package being.altiplano.commumication.protocol;
 
-import java.util.function.Function;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GenericClient<REQUEST, RESPONSE> implements Client<REQUEST, RESPONSE> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GenericClient.class);
+
     private final Client<byte[], byte[]> innerClient;
 
-    private final Function<REQUEST, byte[]> requestSerializer;
+    private final Serializer<REQUEST> requestSerializer;
 
-    private final Function<byte[], RESPONSE> responseDeserializer;
+    private final Deserializer<RESPONSE> responseDeserializer;
 
     public GenericClient(Client<byte[], byte[]> innerClient,
-                         Function<REQUEST, byte[]> requestSerializer,
-                         Function<byte[], RESPONSE> responseDeserializer) {
+                         Serializer<REQUEST> requestSerializer,
+                         Deserializer<RESPONSE> responseDeserializer) {
         this.innerClient = innerClient;
         this.requestSerializer = requestSerializer;
         this.responseDeserializer = responseDeserializer;
@@ -29,7 +32,8 @@ public class GenericClient<REQUEST, RESPONSE> implements Client<REQUEST, RESPONS
 
     @Override
     public void request(REQUEST request) {
-        byte[] reqInBytes = requestSerializer.apply(request);
+        LOGGER.info("make request");
+        byte[] reqInBytes = requestSerializer.serialize(request);
         innerClient.request(reqInBytes);
     }
 
@@ -47,7 +51,7 @@ public class GenericClient<REQUEST, RESPONSE> implements Client<REQUEST, RESPONS
 
         @Override
         public void onEvent(byte[] responseInBytes) {
-            RESPONSE response = responseDeserializer.apply(responseInBytes);
+            RESPONSE response = responseDeserializer.deserialize(responseInBytes);
             listener.onEvent(response);
         }
     }

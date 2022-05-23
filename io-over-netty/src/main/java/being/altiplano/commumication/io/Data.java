@@ -8,7 +8,7 @@ import java.util.Objects;
 /**
  * A reference to a slice in bytes array
  */
-class ByteSlice {
+class Slice {
     public final byte[] data;
 
     public final int offset;
@@ -18,11 +18,11 @@ class ByteSlice {
     /**
      * @param data
      */
-    public ByteSlice(byte[] data) {
+    public Slice(byte[] data) {
         this(data, 0, data.length);
     }
 
-    public ByteSlice(byte[] data, int offset, int length) {
+    public Slice(byte[] data, int offset, int length) {
         this.data = data;
         if (offset < 0 || length <= 0) {
             throw new IllegalArgumentException();
@@ -38,11 +38,11 @@ class ByteSlice {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ByteSlice byteSlice = (ByteSlice) o;
-        if (this.isAllBytesUsed() && byteSlice.isAllBytesUsed()) {
-            return Arrays.equals(data, byteSlice.data);
+        Slice slice = (Slice) o;
+        if (this.isAllBytesUsed() && slice.isAllBytesUsed()) {
+            return Arrays.equals(data, slice.data);
         }
-        return Arrays.equals(getUsedBytes(), byteSlice.getUsedBytes());
+        return Arrays.equals(getUsedBytes(), slice.getUsedBytes());
     }
 
     private boolean isAllBytesUsed() {
@@ -111,7 +111,7 @@ class Frame {
     /**
      * 数据
      */
-    private ByteSlice body;
+    private Slice body;
 
     public Frame(int magic, byte control, int bodyLength) {
         this.magic = magic;
@@ -119,7 +119,7 @@ class Frame {
         this.control = control;
     }
 
-    public Frame(int magic, byte control, ByteSlice body) {
+    public Frame(int magic, byte control, Slice body) {
         this.magic = magic;
         this.control = control;
         this.bodyLength = body.length;
@@ -138,7 +138,7 @@ class Frame {
         if (doCopy) {
             bodyBytes = body.clone();
         }
-        this.body = new ByteSlice(bodyBytes);
+        this.body = new Slice(bodyBytes);
     }
 
     public int getMagic() {
@@ -153,11 +153,11 @@ class Frame {
         return bodyLength;
     }
 
-    ByteSlice getBody() {
+    Slice getBody() {
         return body;
     }
 
-    Frame setBody(ByteSlice body) {
+    Frame setBody(Slice body) {
         if (body.length != bodyLength) {
             throw new IllegalArgumentException("array size mismatch");
         }
@@ -166,7 +166,7 @@ class Frame {
     }
 
     Frame setBody(byte[] body, boolean doCopy) {
-        ByteSlice slice = new ByteSlice(doCopy ? body.clone() : body);
+        Slice slice = new Slice(doCopy ? body.clone() : body);
         return setBody(slice);
     }
 
@@ -221,11 +221,11 @@ class Frame {
         byte[] result = new byte[len];
         int offset = 0;
         for (Frame frame : frames) {
-            ByteSlice src = frame.body;
+            Slice src = frame.body;
             System.arraycopy(src.data, src.offset, result, offset, src.length);
             offset += frame.bodyLength;
         }
-        ByteSlice resultSlice = new ByteSlice(result, 0, len);
+        Slice resultSlice = new Slice(result, 0, len);
 
         return new Frame(magic, (byte) (first.control | INTEGRAL_MASK), resultSlice);
     }

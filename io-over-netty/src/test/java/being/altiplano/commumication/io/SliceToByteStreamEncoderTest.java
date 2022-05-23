@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-class BlockToByteEncoderTest {
+class SliceToByteStreamEncoderTest {
     @Test
     public void testEncodeWithOneFrame() {
         givenAndExpects(0x12345678, 10, "0123456789",
@@ -50,9 +50,9 @@ class BlockToByteEncoderTest {
     }
 
     private void givenAndExpects(int magic, int frameSize, String given, Frame... expectFrames) {
-        EmbeddedChannel channel = new EmbeddedChannel(new BlockToByteEncoder(magic, frameSize));
+        EmbeddedChannel channel = new EmbeddedChannel(new SliceToByteStreamEncoder(magic, frameSize));
 
-        ByteSlice data = new ByteSlice(given.getBytes(StandardCharsets.UTF_8));
+        Slice data = new Slice(given.getBytes(StandardCharsets.UTF_8));
 
         Assertions.assertTrue(channel.writeOutbound(data));
 

@@ -26,8 +26,9 @@ public abstract class Server<REQUEST, RESPONSE> implements Closeable {
         }
     }
 
-    public void setProcessor(Function<REQUEST, RESPONSE> processor) {
+    public Server<REQUEST, RESPONSE> setProcessor(Function<REQUEST, RESPONSE> processor) {
         this.processor = processor;
+        return this;
     }
 
     protected RESPONSE processRequest(REQUEST request) {

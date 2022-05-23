@@ -118,7 +118,7 @@
     <modules>
         <module>protocol</module>
         <module>ioservice</module>
-        <module>io-over-socket</module>
+        <module>io-over-netty</module>
     </modules>
 
 

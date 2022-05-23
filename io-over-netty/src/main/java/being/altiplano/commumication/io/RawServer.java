@@ -9,8 +9,12 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.concurrent.Future;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class RawServer extends Server<byte[], byte[]> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RawServer.class);
+
     protected final int port;
 
     private final int magic;
@@ -48,20 +52,22 @@ class RawServer extends Server<byte[], byte[]> {
     private ChannelInitializer<SocketChannel> createChannelInitializer() {
         return new ChannelInitializer<SocketChannel>() {
             @Override
-            protected void initChannel(SocketChannel ch) throws Exception {
+            protected void initChannel(SocketChannel ch) {
                 ChannelPipeline p = ch.pipeline();
-                p.addLast(
-                        new ByteToFrameDecoder(frameSize), // inbound (request: bytes stream -> frame)
-                        new FrameToBlockDecoder(magic), // inbound (request: frame -> block)
-                        new BlockToRawObjectDecoder() {
-                            @Override
-                            protected void onReceiveData(ChannelHandlerContext ctx, byte[] rawRequest) {
-                                onReceiveRawRequest(ctx, rawRequest);
-                            }
-                        }, // inbound (request: block -> raw request bytes)
-                        new BlockToByteEncoder(magic, frameSize) // outbound (response: block -> frame -> bytes stream)
-                );
+                p.addLast(getChannelInitialHandlers());
             }
+        };
+    }
+
+    private ChannelHandler[] getChannelInitialHandlers(){
+        return new ChannelHandler[]{
+                new ByteStreamToFrameDecoder(frameSize).setLogPrefix("server got request"), // inbound (request: bytes stream -> frame)
+                new FramesToBlockDecoder(magic).setLogPrefix("server got request"), // inbound (request: frame -> block)
+                new BlockToRawObjectDecoder(this::onReceiveRawRequest).setLogPrefix("server got request"), // inbound (request: block -> raw bytes)
+
+//                new SliceToFramesEncoder(magic,frameSize).setLogPrefix("server send response"),
+//                new FrameToByteStreamEncoder().setLogPrefix("server send response"),
+                        new SliceToByteStreamEncoder(magic, frameSize).setLogPrefix("server send response") // outbound (response: block -> frame -> bytes stream)
         };
     }
 
@@ -81,9 +87,13 @@ class RawServer extends Server<byte[], byte[]> {
     }
 
     private void onReceiveRawRequest(ChannelHandlerContext ctx, byte[] rawRequest) {
+        LOGGER.info("server: got request");
         byte[] response = super.processRequest(rawRequest);
+        LOGGER.info("server: response prepared");
         if (response != null && response.length > 0) {
-            ctx.write(response);
+            LOGGER.info("server: write response");
+            ctx.channel().writeAndFlush(new Slice(response));
+            LOGGER.info("server: write response method returned");
         }
     }
 }

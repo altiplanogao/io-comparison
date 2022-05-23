@@ -3,28 +3,37 @@ package being.altiplano.commumication.io;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-class ByteToFrameDecoder extends ByteToMessageDecoder {
+class ByteStreamToFrameDecoder extends ByteToMessageDecoder {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ByteStreamToFrameDecoder.class);
     private enum State {
         HEADER,
         BODY
     }
 
+    private String logPrefix = "";
     private final int frameSizeLimit;
     private State state = State.HEADER;
     private Frame frame;
 
-    public ByteToFrameDecoder() {
+    public ByteStreamToFrameDecoder() {
         this(128);
     }
 
-    public ByteToFrameDecoder(int frameSizeLimit) {
+    public ByteStreamToFrameDecoder(int frameSizeLimit) {
         if (frameSizeLimit < 8) {
             throw new IllegalArgumentException("Frame size limit too small");
         }
         this.frameSizeLimit = frameSizeLimit;
+    }
+
+    public ByteStreamToFrameDecoder setLogPrefix(String logPrefix) {
+        this.logPrefix = logPrefix;
+        return this;
     }
 
     @Override
@@ -54,6 +63,7 @@ class ByteToFrameDecoder extends ByteToMessageDecoder {
                 in.readBytes(body, 0, frame.getBodyLength());
                 frame.setBody(body, false);
                 list.add(frame);
+                LOGGER.info("{}: byte stream -> frame", logPrefix);
                 frame = null;
                 state = State.HEADER;
                 break;
