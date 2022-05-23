@@ -65,9 +65,9 @@ class RawServer extends Server<byte[], byte[]> {
                 new FramesToBlockDecoder(magic).setLogPrefix("server got request"), // inbound (request: frame -> block)
                 new BlockToRawObjectDecoder(this::onReceiveRawRequest).setLogPrefix("server got request"), // inbound (request: block -> raw bytes)
 
-//                new SliceToFramesEncoder(magic,frameSize).setLogPrefix("server send response"),
-//                new FrameToByteStreamEncoder().setLogPrefix("server send response"),
-                        new SliceToByteStreamEncoder(magic, frameSize).setLogPrefix("server send response") // outbound (response: block -> frame -> bytes stream)
+                new FrameToByteStreamEncoder().setLogPrefix("server send response"),
+                new SliceToFramesEncoder(magic,frameSize).setLogPrefix("server send response"),
+//                        new SliceToByteStreamEncoder(magic, frameSize).setLogPrefix("server send response") // outbound (response: block -> frame -> bytes stream)
         };
     }
 

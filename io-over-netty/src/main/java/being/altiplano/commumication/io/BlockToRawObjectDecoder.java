@@ -25,7 +25,9 @@ class BlockToRawObjectDecoder extends MessageToMessageDecoder<Block> {
     protected void decode(ChannelHandlerContext channelHandlerContext, Block block, List<Object> list) throws Exception {
         byte[] rawRequest = block.data;
         LOGGER.info("{}: block -> raw object bytes", logPrefix);
-        receiveDataHandler.onData(channelHandlerContext, rawRequest);
+        if (receiveDataHandler != null) {
+            receiveDataHandler.onData(channelHandlerContext, rawRequest);
+        }
         list.add(rawRequest);
     }
 

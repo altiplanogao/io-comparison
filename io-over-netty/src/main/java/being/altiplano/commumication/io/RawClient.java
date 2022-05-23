@@ -70,9 +70,9 @@ class RawClient implements Client<byte[], byte[]> {
                 new FramesToBlockDecoder(magic).setLogPrefix("client got response"), // inbound (response: frame -> block)
                 new BlockToRawObjectDecoder(this::onReceiveRawResponse).setLogPrefix("client got response"), // inbound (response: block -> raw bytes)
 
-//                new SliceToFramesEncoder(magic,frameSize).setLogPrefix("client send request"),
-//                new FrameToByteStreamEncoder().setLogPrefix("client send request"),
-                new SliceToByteStreamEncoder(magic, frameSize).setLogPrefix("client send request") // outbound (request: block -> frame -> bytes stream)
+                new FrameToByteStreamEncoder().setLogPrefix("client send request"),
+                new SliceToFramesEncoder(magic,frameSize).setLogPrefix("client send request"),
+//                new SliceToByteStreamEncoder(magic, frameSize).setLogPrefix("client send request") // outbound (request: block -> frame -> bytes stream)
         };
     }
 

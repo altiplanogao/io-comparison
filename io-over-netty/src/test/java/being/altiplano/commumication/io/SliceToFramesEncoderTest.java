@@ -10,7 +10,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-class SliceToByteStreamEncoderTest {
+import static org.junit.jupiter.api.Assertions.*;
+
+class SliceToFramesEncoderTest {
     @Test
     public void testEncodeWithOneFrame() {
         givenAndExpects(0x12345678, 10, "0123456789",
@@ -50,29 +52,19 @@ class SliceToByteStreamEncoderTest {
     }
 
     private void givenAndExpects(int magic, int frameSize, String given, Frame... expectFrames) {
-        EmbeddedChannel channel = new EmbeddedChannel(new SliceToByteStreamEncoder(magic, frameSize));
+        EmbeddedChannel channel = new EmbeddedChannel(new SliceToFramesEncoder(magic, frameSize));
 
         Slice data = new Slice(given.getBytes(StandardCharsets.UTF_8));
 
         Assertions.assertTrue(channel.writeOutbound(data));
 
-        ByteBuf byteBuf = channel.readOutbound();
-        byte[] dataGot = new byte[byteBuf.readableBytes()];
-        byteBuf.readBytes(dataGot);
-
-        List<byte[]> bytesList = new ArrayList<>();
-        for (Frame frame : expectFrames) {
-            byte[] bytes = frame.getBytes(true, true);
-            bytesList.add(bytes);
+        List<Frame> framesGot = new ArrayList<>();
+        for (int i = 0; i < expectFrames.length; i++) {
+            framesGot.add(channel.readOutbound());
         }
+        Assertions.assertNull( channel.readOutbound());
+        Frame[] dataGot = framesGot.toArray(new Frame[0]);
 
-        int expectBytesLen = bytesList.stream().map(bytes -> bytes.length).reduce(0, Integer::sum);
-        ByteBuffer bb = ByteBuffer.allocate(expectBytesLen);
-        for (byte[] bytes : bytesList) {
-            bb.put(bytes);
-        }
-        byte[] expectBytes = bb.array();
-
-        Assertions.assertArrayEquals(expectBytes, dataGot);
+        Assertions.assertArrayEquals(expectFrames, dataGot);
     }
 }
