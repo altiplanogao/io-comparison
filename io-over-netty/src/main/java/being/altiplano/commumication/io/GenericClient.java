@@ -17,7 +17,7 @@ class GenericClient<REQUEST, RESPONSE> extends Client<REQUEST, RESPONSE> {
         rawClient = new RawClient(address, port, magic, frameSize) {
             @Override
             protected void onReceiveRawResponse(ChannelHandlerContext ctx, byte[] rawResponse) {
-                GenericClient.this.onReceiveRawResponse(rawResponse);
+                GenericClient.this.handleRawResponse(rawResponse);
             }
         };
     }
@@ -35,5 +35,9 @@ class GenericClient<REQUEST, RESPONSE> extends Client<REQUEST, RESPONSE> {
     @Override
     protected void rawRequest(byte[] bytesOfRequest) {
         rawClient.request(bytesOfRequest);
+    }
+
+    private void handleRawResponse(byte[] rawResponse) {
+        GenericClient.this.onReceiveRawResponse(rawResponse);
     }
 }

@@ -40,7 +40,7 @@ public abstract class Client<REQUEST, RESPONSE> implements Closeable {
 
     protected abstract void rawRequest(byte[] req);
 
-    protected void onReceiveRawResponse(byte[] rawResponse){
+    protected final void onReceiveRawResponse(byte[] rawResponse){
         RESPONSE response = responseDeserializer.apply(rawResponse);
         responseListenable.fire(response);
     }

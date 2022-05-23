@@ -49,7 +49,7 @@ abstract class RawClient {
                                         protected void onReceiveData(ChannelHandlerContext ctx, byte[] rawResponse) {
                                             onReceiveRawResponse(ctx, rawResponse);
                                         }
-                                    },
+                                    }, // inbound
                                     new BlockToByteEncoder(magic, frameSize) // outbound
                             );
                         }
