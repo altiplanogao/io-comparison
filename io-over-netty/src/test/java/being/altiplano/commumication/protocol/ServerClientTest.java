@@ -1,15 +1,14 @@
-package being.altiplano.commumication.io;
+package being.altiplano.commumication.protocol;
 
+import being.altiplano.commumication.io.ClientFactory;
+import being.altiplano.commumication.io.ServerFactory;
 import being.altiplano.commumication.mock.*;
-import being.altiplano.commumication.protocol.Client;
-import being.altiplano.commumication.protocol.Server;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
 class ServerClientTest {
     int port = 9999;
@@ -28,11 +27,24 @@ class ServerClientTest {
     }
 
     @Test
-    public void simpleTest() throws InterruptedException, IOException {
+    public void simpleResponseCount() throws InterruptedException, IOException {
         try (Server<MRequest, MResponse> server = createServer(port);
              Client<MRequest, MResponse> client = createClient(port)){
             server.start();
             client.start();
+
+            AtomicInteger serverRawRequestCounter = new AtomicInteger(0);
+            AtomicInteger serverRawResponseCounter = new AtomicInteger(0);
+            AtomicInteger serverRequestCounter = new AtomicInteger(0);
+            AtomicInteger serverResponseCounter = new AtomicInteger(0);
+            server.addRequestListener(event -> serverRequestCounter.incrementAndGet())
+                    .addResponseListener(event -> serverResponseCounter.incrementAndGet());
+            if(server instanceof GenericServer) {
+                GenericServer<MRequest, MResponse> genericServer = (GenericServer<MRequest, MResponse>)server;
+                Server<byte[], byte[]> innerServer = genericServer.getInnerServer();
+                innerServer.addRequestListener(event -> serverRawRequestCounter.incrementAndGet());
+                innerServer.addResponseListener(event -> serverRawResponseCounter.incrementAndGet());
+            }
 
             MRequest[] requests = new MRequest[]{
                     new MRequest(MCmdCode.UPPER, "Abc"),
@@ -45,9 +57,7 @@ class ServerClientTest {
                     new MRequest(MCmdCode.ECHO, "xyz"),
             };
             CountDownLatch waitResponse = new CountDownLatch(1);
-            List<MResponse> responses = new ArrayList<>();
             client.addResponseListener(event -> {
-                responses.add(event);
                 if ("xyz".equals(event.getData())){
                     waitResponse.countDown();
                 }
@@ -56,19 +66,12 @@ class ServerClientTest {
                 client.request(request);
             }
 
-            MResponse[] expects = new MResponse[]{
-                    new MResponse("ABC"),
-                    new MResponse("abc"),
-                    new MResponse( "abc"),
-                    new MResponse( "abcabc"),
-                    new MResponse( "cba"),
-                    new MResponse( "3"),
-                    new MResponse("xyz")
-            };
-
             waitResponse.await();
 
-            Assertions.assertArrayEquals(expects, responses.toArray(new MResponse[0]));
+            Assertions.assertEquals(8, serverRawRequestCounter.get());
+            Assertions.assertEquals(8, serverRawResponseCounter.get());
+            Assertions.assertEquals(8, serverRequestCounter.get());
+            Assertions.assertEquals(8, serverResponseCounter.get());
 
             client.stop();
             server.stop(true);

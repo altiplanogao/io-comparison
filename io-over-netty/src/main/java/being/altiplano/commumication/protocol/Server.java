@@ -38,16 +38,18 @@ public abstract class Server<REQUEST, RESPONSE> implements Closeable {
         return response;
     }
 
-    public final void addRequestListener(Listener<REQUEST> requestListener) {
+    public final Server<REQUEST, RESPONSE> addRequestListener(Listener<REQUEST> requestListener) {
         requestListenable.addListener(requestListener);
+        return this;
     }
 
     public final boolean removeRequestListener(Listener<REQUEST> requestListener) {
         return requestListenable.removeListener(requestListener);
     }
 
-    public final void addResponseListener(Listener<Pair<REQUEST, RESPONSE>> responseListener) {
+    public final Server<REQUEST, RESPONSE> addResponseListener(Listener<Pair<REQUEST, RESPONSE>> responseListener) {
         responseListenable.addListener(responseListener);
+        return this;
     }
 
     public final boolean removeResponseListener(Listener<Pair<REQUEST, RESPONSE>> responseListener) {

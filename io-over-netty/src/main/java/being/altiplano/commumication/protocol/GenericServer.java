@@ -24,6 +24,10 @@ public class GenericServer<REQUEST, RESPONSE> extends Server<REQUEST, RESPONSE> 
         this.responseSerializer = responseSerializer;
     }
 
+    Server<byte[], byte[]> getInnerServer() {
+        return innerServer;
+    }
+
     @Override
     public Server<REQUEST, RESPONSE> setProcessor(final Function<REQUEST, RESPONSE> processor) {
         super.setProcessor(processor);
