@@ -1,34 +1,17 @@
 package being.altiplano.commumication.protocol;
 
-import io.netty.channel.ChannelHandlerContext;
-
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.function.Function;
 
 public abstract class Server<REQUEST, RESPONSE> implements Closeable {
-
-    private final Class<REQUEST> requestDataType;
-    private final Function<byte[],REQUEST> requestDeserializer;
-
-    private final Class<RESPONSE> responseDataType;
-    private final Function< RESPONSE, byte[]> responseSerializer;
-
     private final Listenable<REQUEST> requestListenable = new Listenable<>();
 
-    private final Listenable<RESPONSE> responseListenable = new Listenable<>();
+    private final Listenable<RequestResponsePair<REQUEST, RESPONSE>> responseListenable = new Listenable<>();
 
+    private Function<REQUEST, RESPONSE> processor;
 
-    private final Function<REQUEST, RESPONSE> requestHandler;
-
-    public Server(Class<REQUEST> requestDataType, Function<byte[], REQUEST> requestDeserializer,
-                  Class<RESPONSE> responseDataType, Function<RESPONSE, byte[]> responseSerializer,
-                  Function<REQUEST, RESPONSE> requestHandler) {
-        this.requestDataType = requestDataType;
-        this.requestDeserializer = requestDeserializer;
-        this.responseDataType = responseDataType;
-        this.responseSerializer = responseSerializer;
-        this.requestHandler = requestHandler;
+    protected Server() {
     }
 
     public abstract void start() throws InterruptedException;
@@ -43,12 +26,22 @@ public abstract class Server<REQUEST, RESPONSE> implements Closeable {
         }
     }
 
-    protected final void onReceiveRawRequest(ChannelHandlerContext ctx, byte[] rawRequest){
-        REQUEST request = requestDeserializer.apply(rawRequest);
+    public void setProcessor(Function<REQUEST, RESPONSE> processor) {
+        this.processor = processor;
+    }
+
+    protected RESPONSE processRequest(REQUEST request) {
         requestListenable.fire(request);
-        //不太合理
-        RESPONSE response = requestHandler.apply(request);
-        responseListenable.fire(response);
-        ctx.write(response);
+        RESPONSE response = processor == null ? null : processor.apply(request);
+        responseListenable.fire(new RequestResponsePair<>(request, response));
+        return response;
+    }
+
+    public final void registerRequestListener(Listener<REQUEST> requestListener) {
+        requestListenable.addListener(requestListener);
+    }
+
+    public final void registerResponseListener(Listener<RequestResponsePair<REQUEST, RESPONSE>> responseListener) {
+        responseListenable.addListener(responseListener);
     }
 }

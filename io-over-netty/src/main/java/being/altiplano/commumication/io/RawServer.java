@@ -10,7 +10,7 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.concurrent.Future;
 
-abstract class RawServer {
+class RawServer extends Server<byte[], byte[]> {
     protected final int port;
 
     private final int magic;
@@ -27,6 +27,7 @@ abstract class RawServer {
         this.frameSize = frameSize;
     }
 
+    @Override
     public void start() throws InterruptedException {
         bossGroup = new NioEventLoopGroup();
         workerGroup = new NioEventLoopGroup();
@@ -37,31 +38,34 @@ abstract class RawServer {
                     .channel(NioServerSocketChannel.class)
                     .option(ChannelOption.SO_BACKLOG, 0)
                     .handler(new LoggingHandler(LogLevel.DEBUG))
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel ch) throws Exception {
-                            ChannelPipeline p = ch.pipeline();
-                            p.addLast(
-                                    new ByteToFrameDecoder(frameSize), // inbound
-                                    new FrameToBlockDecoder(magic), // inbound
-                                    new BlockToRawObjectDecoder() {
-                                        @Override
-                                        protected void onReceiveData(ChannelHandlerContext ctx, byte[] rawRequest) {
-                                            onReceiveRawRequest(ctx, rawRequest);
-                                        }
-                                    }, // inbound
-                                    new BlockToByteEncoder(magic, frameSize) // outbound
-                            );
-                        }
-                    });
+                    .childHandler(createChannelInitializer());
 
             serverChannel = b.bind(this.port).sync().channel();
         } finally {
         }
     }
 
-    protected abstract void onReceiveRawRequest(ChannelHandlerContext ctx, byte[] rawRequest);
+    private ChannelInitializer<SocketChannel> createChannelInitializer() {
+        return new ChannelInitializer<SocketChannel>() {
+            @Override
+            protected void initChannel(SocketChannel ch) throws Exception {
+                ChannelPipeline p = ch.pipeline();
+                p.addLast(
+                        new ByteToFrameDecoder(frameSize), // inbound (request: bytes stream -> frame)
+                        new FrameToBlockDecoder(magic), // inbound (request: frame -> block)
+                        new BlockToRawObjectDecoder() {
+                            @Override
+                            protected void onReceiveData(ChannelHandlerContext ctx, byte[] rawRequest) {
+                                onReceiveRawRequest(ctx, rawRequest);
+                            }
+                        }, // inbound (request: block -> raw request bytes)
+                        new BlockToByteEncoder(magic, frameSize) // outbound (response: block -> frame -> bytes stream)
+                );
+            }
+        };
+    }
 
+    @Override
     public void stop(boolean waitDone) throws InterruptedException {
         ChannelFuture closeFuture = serverChannel.close();
         Future<?> bsf = bossGroup.shutdownGracefully();
@@ -76,4 +80,10 @@ abstract class RawServer {
         }
     }
 
+    private void onReceiveRawRequest(ChannelHandlerContext ctx, byte[] rawRequest) {
+        byte[] response = super.processRequest(rawRequest);
+        if (response != null && response.length > 0) {
+            ctx.write(response);
+        }
+    }
 }

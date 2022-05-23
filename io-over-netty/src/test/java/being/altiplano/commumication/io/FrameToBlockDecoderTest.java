@@ -75,13 +75,13 @@ class FrameToBlockDecoderTest {
         givenAndExpects(new Frame[]{
                         new Frame(magic, (byte) 0b11000000, "ABC".getBytes(StandardCharsets.UTF_8)),
                         new Frame(magic, (byte) 0b11000000, "DEF".getBytes(StandardCharsets.UTF_8))},
-                "ABC","DEF");
+                "ABC", "DEF");
         givenAndExpects(new Frame[]{
                         new Frame(magic, (byte) 0b11000000, "ABC".getBytes(StandardCharsets.UTF_8)),
                         new Frame(magic, (byte) 0b10000000, "D".getBytes(StandardCharsets.UTF_8)),
                         new Frame(magic, (byte) 0b00000000, "E".getBytes(StandardCharsets.UTF_8)),
                         new Frame(magic, (byte) 0b01000000, "F".getBytes(StandardCharsets.UTF_8))},
-                "ABC","DEF");
+                "ABC", "DEF");
     }
 
     private void givenAndExpects(Frame[] given, String... expects) {
