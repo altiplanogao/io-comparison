@@ -10,6 +10,7 @@ public class MResponse {
     }
 
     public MResponse() {
+        this("");
     }
 
     public String getData() {

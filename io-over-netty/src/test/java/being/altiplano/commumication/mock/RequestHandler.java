@@ -23,7 +23,7 @@ public class RequestHandler implements Function<MRequest, MResponse> {
             case COUNT:
                 return new MResponse(Integer.toString(input.length()));
             case NO_REPLY:
-                return new MResponse();
+                return null;
             default:
                 throw new NotImplementedException("Unexpected " + mRequest.code);
         }

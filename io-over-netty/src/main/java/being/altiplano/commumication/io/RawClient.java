@@ -1,8 +1,6 @@
 package being.altiplano.commumication.io;
 
 import being.altiplano.commumication.protocol.Client;
-import being.altiplano.commumication.protocol.Listenable;
-import being.altiplano.commumication.protocol.Listener;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -14,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-class RawClient implements Client<byte[], byte[]> {
+class RawClient extends Client<byte[], byte[]> {
     private static final Logger LOGGER = LoggerFactory.getLogger(RawClient.class);
 
     private final AtomicBoolean connected = new AtomicBoolean(false);
@@ -26,8 +24,6 @@ class RawClient implements Client<byte[], byte[]> {
 
     private EventLoopGroup workerGroup;
     private Channel channel;
-
-    private final Listenable<byte[]> responseListenable = new Listenable<>();
 
     public RawClient(String address, int port,
                      int magic, int frameSize) {
@@ -68,7 +64,7 @@ class RawClient implements Client<byte[], byte[]> {
                 //new LoggingHandler(LogLevel.INFO),
                 new ByteStreamToFrameDecoder(frameSize).setLogPrefix("client got response"), // inbound (response: bytes stream -> frame)
                 new FramesToBlockDecoder(magic).setLogPrefix("client got response"), // inbound (response: frame -> block)
-                new BlockToRawObjectDecoder(this::onReceiveRawResponse).setLogPrefix("client got response"), // inbound (response: block -> raw bytes)
+                new BlockToRawObjectDecoder(this::onReceiveResponse).setLogPrefix("client got response"), // inbound (response: block -> raw bytes)
 
                 new FrameToByteStreamEncoder().setLogPrefix("client send request"),
                 new SliceToFramesEncoder(magic,frameSize).setLogPrefix("client send request"),
@@ -92,12 +88,7 @@ class RawClient implements Client<byte[], byte[]> {
         channel.writeAndFlush(new Slice(bytesOfRequest));
     }
 
-    @Override
-    public void registerResponseListener(Listener<byte[]> listener) {
-        responseListenable.addListener(listener);
-    }
-
-    protected final void onReceiveRawResponse(ChannelHandlerContext ctx, byte[] rawResponse) {
-        responseListenable.fire(rawResponse);
+    protected final void onReceiveResponse(ChannelHandlerContext ctx, byte[] response) {
+        super.fireResponseReceivedEvent(response);
     }
 }

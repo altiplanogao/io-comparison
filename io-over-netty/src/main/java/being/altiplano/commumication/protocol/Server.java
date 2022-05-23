@@ -7,7 +7,7 @@ import java.util.function.Function;
 public abstract class Server<REQUEST, RESPONSE> implements Closeable {
     private final Listenable<REQUEST> requestListenable = new Listenable<>();
 
-    private final Listenable<RequestResponsePair<REQUEST, RESPONSE>> responseListenable = new Listenable<>();
+    private final Listenable<Pair<REQUEST, RESPONSE>> responseListenable = new Listenable<>();
 
     private Function<REQUEST, RESPONSE> processor;
 
@@ -34,15 +34,23 @@ public abstract class Server<REQUEST, RESPONSE> implements Closeable {
     protected RESPONSE processRequest(REQUEST request) {
         requestListenable.fire(request);
         RESPONSE response = processor == null ? null : processor.apply(request);
-        responseListenable.fire(new RequestResponsePair<>(request, response));
+        responseListenable.fire(new Pair<>(request, response));
         return response;
     }
 
-    public final void registerRequestListener(Listener<REQUEST> requestListener) {
+    public final void addRequestListener(Listener<REQUEST> requestListener) {
         requestListenable.addListener(requestListener);
     }
 
-    public final void registerResponseListener(Listener<RequestResponsePair<REQUEST, RESPONSE>> responseListener) {
+    public final boolean removeRequestListener(Listener<REQUEST> requestListener) {
+        return requestListenable.removeListener(requestListener);
+    }
+
+    public final void addResponseListener(Listener<Pair<REQUEST, RESPONSE>> responseListener) {
         responseListenable.addListener(responseListener);
+    }
+
+    public final boolean removeResponseListener(Listener<Pair<REQUEST, RESPONSE>> responseListener) {
+        return responseListenable.removeListener(responseListener);
     }
 }

@@ -32,8 +32,10 @@ public class GenericServer<REQUEST, RESPONSE> extends Server<REQUEST, RESPONSE> 
             LOGGER.info("server: got request");
             RESPONSE res = processRequest(req);
             LOGGER.info("server: response prepared");
-            byte[] resBytes = responseSerializer.serialize(res);
-            return resBytes;
+            if (res == null) {
+                return null;
+            }
+            return responseSerializer.serialize(res);
         };
         this.innerServer.setProcessor(innerProcessor);
         return this;

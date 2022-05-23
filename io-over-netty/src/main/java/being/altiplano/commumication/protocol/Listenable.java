@@ -10,7 +10,11 @@ public class Listenable<T> {
         listeners.add(listener);
     }
 
-    public void fire(T event) {
+    public boolean removeListener(Listener<T> listener) {
+        return listeners.remove(listener);
+    }
+
+    public final void fire(T event) {
         for (Listener<T> listener : listeners) {
             listener.onEvent(event);
         }

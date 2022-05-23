@@ -1,12 +1,15 @@
 package being.altiplano.commumication.io;
 
 import being.altiplano.commumication.mock.*;
-import being.altiplano.commumication.protocol.*;
+import being.altiplano.commumication.protocol.Client;
+import being.altiplano.commumication.protocol.Server;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -34,16 +37,40 @@ class ServerClientTest {
             server.start();
             client.start();
 
+            MRequest[] requests = new MRequest[]{
+                    new MRequest(MCmdCode.UPPER, "Abc"),
+                    new MRequest(MCmdCode.LOWER, "Abc"),
+                    new MRequest(MCmdCode.ECHO, "abc"),
+                    new MRequest(MCmdCode.ECHO_TWICE, "abc"),
+                    new MRequest(MCmdCode.REVERSE, "abc"),
+                    new MRequest(MCmdCode.COUNT, "abc"),
+                    new MRequest(MCmdCode.NO_REPLY, "abc"),
+                    new MRequest(MCmdCode.ECHO, "xyz"),
+            };
             CountDownLatch waitResponse = new CountDownLatch(1);
-            AtomicReference<MResponse> responseHolder = new AtomicReference<>();
-            client.registerResponseListener(event -> {
-                responseHolder.set(event);
-                waitResponse.countDown();
+            List<MResponse> responses = new ArrayList<>();
+            client.addResponseListener(event -> {
+                responses.add(event);
+                if ("xyz".equals(event.getData())){
+                    waitResponse.countDown();
+                }
             });
+            for (MRequest request : requests) {
+                client.request(request);
+            }
 
-            client.request(new MRequest(MCmdCode.REVERSE, "abc"));
+            MResponse[] expects = new MResponse[]{
+                    new MResponse("ABC"),
+                    new MResponse("abc"),
+                    new MResponse( "abc"),
+                    new MResponse( "abcabc"),
+                    new MResponse( "cba"),
+                    new MResponse( "3"),
+                    new MResponse("xyz")
+            };
+
             waitResponse.await();
-            Assertions.assertEquals(new MResponse("cba"), responseHolder.get());
+            Assertions.assertArrayEquals(expects, responses.toArray(new MResponse[0]));
 
             client.stop();
             server.stop(true);

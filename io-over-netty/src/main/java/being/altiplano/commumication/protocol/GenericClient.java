@@ -3,7 +3,9 @@ package being.altiplano.commumication.protocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GenericClient<REQUEST, RESPONSE> implements Client<REQUEST, RESPONSE> {
+import java.util.function.Supplier;
+
+public class GenericClient<REQUEST, RESPONSE> extends Client<REQUEST, RESPONSE> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenericClient.class);
 
     private final Client<byte[], byte[]> innerClient;
@@ -12,10 +14,16 @@ public class GenericClient<REQUEST, RESPONSE> implements Client<REQUEST, RESPONS
 
     private final Deserializer<RESPONSE> responseDeserializer;
 
-    public GenericClient(Client<byte[], byte[]> innerClient,
+    public GenericClient(Supplier<Client<byte[], byte[]>> innerClientSupplier,
                          Serializer<REQUEST> requestSerializer,
                          Deserializer<RESPONSE> responseDeserializer) {
-        this.innerClient = innerClient;
+        this.innerClient = innerClientSupplier.get();
+        this.innerClient.addResponseListener(new Listener<byte[]>(){
+            @Override
+            public void onEvent(byte[] rawResponse) {
+                onReceiveRawResponse(rawResponse);
+            }
+        });
         this.requestSerializer = requestSerializer;
         this.responseDeserializer = responseDeserializer;
     }
@@ -37,22 +45,8 @@ public class GenericClient<REQUEST, RESPONSE> implements Client<REQUEST, RESPONS
         innerClient.request(reqInBytes);
     }
 
-    @Override
-    public void registerResponseListener(Listener<RESPONSE> listener) {
-        innerClient.registerResponseListener(new RawResponseListener(listener));
-    }
-
-    private class RawResponseListener implements Listener<byte[]> {
-        final Listener<RESPONSE> listener;
-
-        private RawResponseListener(Listener<RESPONSE> listener) {
-            this.listener = listener;
-        }
-
-        @Override
-        public void onEvent(byte[] responseInBytes) {
-            RESPONSE response = responseDeserializer.deserialize(responseInBytes);
-            listener.onEvent(response);
-        }
+    protected final void onReceiveRawResponse(byte[] rawResponse) {
+        RESPONSE response = responseDeserializer.deserialize(rawResponse);
+        super.fireResponseReceivedEvent(response);
     }
 }

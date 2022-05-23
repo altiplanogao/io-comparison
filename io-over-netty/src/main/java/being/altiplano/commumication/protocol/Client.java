@@ -3,12 +3,14 @@ package being.altiplano.commumication.protocol;
 import java.io.Closeable;
 import java.io.IOException;
 
-public interface Client<REQUEST, RESPONSE> extends Closeable {
-    void start() throws InterruptedException;
+public abstract class Client<REQUEST, RESPONSE> implements Closeable {
+    private final Listenable<RESPONSE> responseListenable = new Listenable<>();
 
-    void stop() throws InterruptedException;
+    public abstract void start() throws InterruptedException;
 
-    default void close() throws IOException {
+    public abstract void stop() throws InterruptedException;
+
+    public final void close() throws IOException {
         try {
             stop();
         } catch (InterruptedException e) {
@@ -16,7 +18,17 @@ public interface Client<REQUEST, RESPONSE> extends Closeable {
         }
     }
 
-    void request(REQUEST request);
+    public abstract void request(REQUEST request);
 
-    void registerResponseListener(Listener<RESPONSE> responseListener);
+    public final void addResponseListener(Listener<RESPONSE> responseListener){
+        responseListenable.addListener(responseListener);
+    }
+
+    public final boolean removeResponseListener(Listener<RESPONSE> responseListener) {
+        return responseListenable.removeListener(responseListener);
+    }
+
+    protected final void fireResponseReceivedEvent(RESPONSE response) {
+        responseListenable.fire(response);
+    }
 }
