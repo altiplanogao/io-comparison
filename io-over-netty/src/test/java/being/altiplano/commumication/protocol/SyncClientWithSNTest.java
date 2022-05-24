@@ -12,12 +12,12 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class SyncClientTest extends ServerClientTestBase {
+class SyncClientWithSNTest extends ServerClientTestBase {
     @Test
     @Order(1)
     public void testWithOneQuery() {
         testWithServerAndClient((server, client) -> {
-            SyncClient<MRequest, MResponse> syncClient = new SyncClient<>(client);
+            SyncClientWithSN<MRequest, MResponse, Integer> syncClient = new SyncClientWithSN<>(client, MRequest::getSn, MResponse::getSn);
             Future<MResponse> responseFuture = syncClient.request(new MRequest(1, MCmdCode.ECHO    , "abc"));
             try {
                 MResponse response = responseFuture.get();
@@ -33,7 +33,7 @@ class SyncClientTest extends ServerClientTestBase {
     public void testWithMultiQuery() {
         testWithServerAndClient((server, client) -> {
             try {
-                SyncClient<MRequest, MResponse> syncClient = new SyncClient<>(client);
+                SyncClientWithSN<MRequest, MResponse, Integer> syncClient = new SyncClientWithSN<>(client, MRequest::getSn, MResponse::getSn);
                 MRequest[] inputs = getInputRequests();
                 MResponse[] expects = getExpectResponses();
 
