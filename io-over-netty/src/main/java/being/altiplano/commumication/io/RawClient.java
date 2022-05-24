@@ -42,26 +42,22 @@ class RawClient extends Client<byte[], byte[]> {
             b.group(workerGroup)
                     .channel(NioSocketChannel.class)
                     .option(ChannelOption.SO_KEEPALIVE, true)
-                    .handler(createChannelInitializer());
+                    .handler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel ch) {
+                            ChannelPipeline p = ch.pipeline();
+                            p.addLast(getChannelInitialHandlers());
+                        }
+                    });
 
             ChannelFuture f = b.connect(address, port).sync();
             channel = f.channel();
         }
     }
 
-    private ChannelInitializer<SocketChannel> createChannelInitializer() {
-        return new ChannelInitializer<SocketChannel>() {
-            @Override
-            protected void initChannel(SocketChannel ch) {
-                ChannelPipeline p = ch.pipeline();
-                p.addLast(getChannelInitialHandlers());
-            }
-        };
-    }
-
     private ChannelHandler[] getChannelInitialHandlers(){
         return new ChannelHandler[]{
-                //new LoggingHandler(LogLevel.INFO),
+//                new LoggingHandler(LogLevel.TRACE),
                 new ByteStreamToFrameDecoder(frameSize).setLogPrefix("client got response"), // inbound (response: bytes stream -> frame)
                 new FramesToBlockDecoder(magic).setLogPrefix("client got response"), // inbound (response: frame -> block)
                 new BlockToRawObjectDecoder(this::onReceiveResponse).setLogPrefix("client got response"), // inbound (response: block -> raw bytes)
@@ -84,7 +80,7 @@ class RawClient extends Client<byte[], byte[]> {
 
     @Override
     public void request(byte[] bytesOfRequest) {
-        LOGGER.info("make request");
+        LOGGER.debug("make request");
         channel.writeAndFlush(new Slice(bytesOfRequest));
     }
 

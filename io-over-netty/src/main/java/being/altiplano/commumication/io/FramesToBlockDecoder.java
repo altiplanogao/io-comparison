@@ -32,7 +32,7 @@ class FramesToBlockDecoder extends MessageToMessageDecoder<Frame> {
             pending.add(frame);
             Frame merged = Frame.makeIntegral(pending.toArray(new Frame[0]));
             Block block = new Block(merged.getBody().getUsedBytes());
-            LOGGER.info("{}: {} frame(s) -> block", logPrefix, pending.size());
+            LOGGER.debug("{}: {} frame(s) -> block", logPrefix, pending.size());
             list.add(block);
             pending.clear();
         } else {

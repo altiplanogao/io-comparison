@@ -18,12 +18,7 @@ public class GenericClient<REQUEST, RESPONSE> extends Client<REQUEST, RESPONSE> 
                          Serializer<REQUEST> requestSerializer,
                          Deserializer<RESPONSE> responseDeserializer) {
         this.innerClient = innerClientSupplier.get();
-        this.innerClient.addResponseListener(new Listener<byte[]>(){
-            @Override
-            public void onEvent(byte[] rawResponse) {
-                onReceiveRawResponse(rawResponse);
-            }
-        });
+        this.innerClient.addResponseListener(this::onReceiveRawResponse);
         this.requestSerializer = requestSerializer;
         this.responseDeserializer = responseDeserializer;
     }
@@ -40,7 +35,7 @@ public class GenericClient<REQUEST, RESPONSE> extends Client<REQUEST, RESPONSE> 
 
     @Override
     public void request(REQUEST request) {
-        LOGGER.info("make request");
+        LOGGER.debug("make request");
         byte[] reqInBytes = requestSerializer.serialize(request);
         innerClient.request(reqInBytes);
     }

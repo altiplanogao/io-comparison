@@ -22,6 +22,6 @@ public class FrameToByteStreamEncoder extends MessageToByteEncoder<Frame> {
         out.writeBytes(frame.headBytes());
         Slice body = frame.getBody();
         out.writeBytes(body.data, body.offset, body.length);
-        LOGGER.info("{}: frame -> bytes stream", logPrefix);
+        LOGGER.debug("{}: frame -> bytes stream", logPrefix);
     }
 }

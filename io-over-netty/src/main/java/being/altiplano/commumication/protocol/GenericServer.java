@@ -33,9 +33,9 @@ public class GenericServer<REQUEST, RESPONSE> extends Server<REQUEST, RESPONSE> 
         super.setProcessor(processor);
         Function<byte[], byte[]> innerProcessor = requestBytes -> {
             REQUEST req = requestDeserializer.deserialize(requestBytes);
-            LOGGER.info("server: got request");
+            LOGGER.debug("server: got request");
             RESPONSE res = processRequest(req);
-            LOGGER.info("server: response prepared");
+            LOGGER.debug("server: response prepared");
             if (res == null) {
                 return null;
             }

@@ -63,7 +63,7 @@ class ByteStreamToFrameDecoder extends ByteToMessageDecoder {
                 in.readBytes(body, 0, frame.getBodyLength());
                 frame.setBody(body, false);
                 list.add(frame);
-                LOGGER.info("{}: byte stream -> frame", logPrefix);
+                LOGGER.debug("{}: byte stream -> frame", logPrefix);
                 frame = null;
                 state = State.HEADER;
                 break;

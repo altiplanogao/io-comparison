@@ -32,7 +32,7 @@ public class SliceToFramesEncoder extends MessageToMessageEncoder<Slice> {
     protected void encode(ChannelHandlerContext context, Slice block, List<Object> list) throws Exception {
         List<Frame> frames = makeFrames(block, magic, frameSize);
         if (!frames.isEmpty()) {
-            LOGGER.info("{}: block -> {} frame(s)", logPrefix, frames.size());
+            LOGGER.debug("{}: block -> {} frame(s)", logPrefix, frames.size());
             list.addAll(frames);
         }
     }

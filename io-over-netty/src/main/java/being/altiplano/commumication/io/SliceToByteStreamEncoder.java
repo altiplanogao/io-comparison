@@ -32,7 +32,7 @@ class SliceToByteStreamEncoder extends MessageToByteEncoder<Slice> {
     protected void encode(ChannelHandlerContext channelHandlerContext, Slice block, ByteBuf out) throws Exception {
         List<Frame> frames = SliceToFramesEncoder.makeFrames(block, magic, frameSize);
         if (!frames.isEmpty()){
-            LOGGER.info("{}: block -> {} frame(s)", logPrefix, frames.size());
+            LOGGER.debug("{}: block -> {} frame(s)", logPrefix, frames.size());
         }
         frames.forEach(f -> writeFrame(f, out));
     }
@@ -41,6 +41,6 @@ class SliceToByteStreamEncoder extends MessageToByteEncoder<Slice> {
         out.writeBytes(frame.headBytes());
         Slice body = frame.getBody();
         out.writeBytes(body.data, body.offset, body.length);
-        LOGGER.info("{}: frame -> bytes stream", logPrefix);
+        LOGGER.debug("{}: frame -> bytes stream", logPrefix);
     }
 }

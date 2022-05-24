@@ -42,21 +42,17 @@ class RawServer extends Server<byte[], byte[]> {
                     .channel(NioServerSocketChannel.class)
                     .option(ChannelOption.SO_BACKLOG, 0)
                     .handler(new LoggingHandler(LogLevel.DEBUG))
-                    .childHandler(createChannelInitializer());
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel ch) {
+                            ChannelPipeline p = ch.pipeline();
+                            p.addLast(getChannelInitialHandlers());
+                        }
+                    });
 
             serverChannel = b.bind(this.port).sync().channel();
         } finally {
         }
-    }
-
-    private ChannelInitializer<SocketChannel> createChannelInitializer() {
-        return new ChannelInitializer<SocketChannel>() {
-            @Override
-            protected void initChannel(SocketChannel ch) {
-                ChannelPipeline p = ch.pipeline();
-                p.addLast(getChannelInitialHandlers());
-            }
-        };
     }
 
     private ChannelHandler[] getChannelInitialHandlers(){
@@ -87,13 +83,13 @@ class RawServer extends Server<byte[], byte[]> {
     }
 
     private void onReceiveRawRequest(ChannelHandlerContext ctx, byte[] rawRequest) {
-        LOGGER.info("server: got request");
+        LOGGER.debug("server: got request");
         byte[] response = super.processRequest(rawRequest);
-        LOGGER.info("server: response prepared");
+        LOGGER.debug("server: response prepared");
         if (response != null && response.length > 0) {
-            LOGGER.info("server: write response");
+            LOGGER.debug("server: write response");
             ctx.channel().writeAndFlush(new Slice(response));
-            LOGGER.info("server: write response method returned");
+            LOGGER.debug("server: write response method returned");
         }
     }
 }
