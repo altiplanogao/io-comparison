@@ -9,19 +9,20 @@ public class RequestHandler implements Function<MRequest, MResponse> {
     @Override
     public MResponse apply(MRequest mRequest) {
         String input = mRequest.getData();
+        int sn = mRequest.sn;
         switch (mRequest.code) {
             case UPPER:
-                return new MResponse(input.toUpperCase());
+                return new MResponse(sn, input.toUpperCase());
             case LOWER:
-                return new MResponse(input.toLowerCase());
+                return new MResponse(sn, input.toLowerCase());
             case ECHO:
-                return new MResponse(input);
+                return new MResponse(sn, input);
             case ECHO_TWICE:
-                return new MResponse(input + input);
+                return new MResponse(sn, input + input);
             case REVERSE:
-                return new MResponse(StringUtils.reverse(input));
+                return new MResponse(sn, StringUtils.reverse(input));
             case COUNT:
-                return new MResponse(Integer.toString(input.length()));
+                return new MResponse(sn, Integer.toString(input.length()));
             case NO_REPLY:
                 return null;
             default:

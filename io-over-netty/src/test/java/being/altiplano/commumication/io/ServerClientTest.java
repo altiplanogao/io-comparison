@@ -34,15 +34,16 @@ class ServerClientTest {
             server.start();
             client.start();
 
+            int snGen = 0;
             MRequest[] requests = new MRequest[]{
-                    new MRequest(MCmdCode.UPPER, "Abc"),
-                    new MRequest(MCmdCode.LOWER, "Abc"),
-                    new MRequest(MCmdCode.ECHO, "abc"),
-                    new MRequest(MCmdCode.ECHO_TWICE, "abc"),
-                    new MRequest(MCmdCode.REVERSE, "abc"),
-                    new MRequest(MCmdCode.COUNT, "abc"),
-                    new MRequest(MCmdCode.NO_REPLY, "abc"),
-                    new MRequest(MCmdCode.ECHO, "xyz"),
+                    new MRequest(snGen++, MCmdCode.UPPER, "Abc"),
+                    new MRequest(snGen++, MCmdCode.LOWER, "Abc"),
+                    new MRequest(snGen++, MCmdCode.ECHO, "abc"),
+                    new MRequest(snGen++, MCmdCode.ECHO_TWICE, "abc"),
+                    new MRequest(snGen++, MCmdCode.REVERSE, "abc"),
+                    new MRequest(snGen++, MCmdCode.COUNT, "abc"),
+                    new MRequest(snGen++, MCmdCode.NO_REPLY, "abc"),
+                    new MRequest(snGen, MCmdCode.ECHO, "xyz"),
             };
             CountDownLatch waitResponse = new CountDownLatch(1);
             List<MResponse> responses = new ArrayList<>();
@@ -56,14 +57,15 @@ class ServerClientTest {
                 client.request(request);
             }
 
+            int respSnGen = 0;
             MResponse[] expects = new MResponse[]{
-                    new MResponse("ABC"),
-                    new MResponse("abc"),
-                    new MResponse( "abc"),
-                    new MResponse( "abcabc"),
-                    new MResponse( "cba"),
-                    new MResponse( "3"),
-                    new MResponse("xyz")
+                    new MResponse(respSnGen++, "ABC"),
+                    new MResponse(respSnGen++, "abc"),
+                    new MResponse(respSnGen++, "abc"),
+                    new MResponse(respSnGen++, "abcabc"),
+                    new MResponse(respSnGen++, "cba"),
+                    new MResponse(respSnGen++, "3"),
+                    new MResponse(respSnGen+1, "xyz")
             };
 
             waitResponse.await();

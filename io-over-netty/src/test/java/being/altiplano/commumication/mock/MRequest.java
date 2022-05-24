@@ -4,14 +4,25 @@ import java.util.Objects;
 
 public class MRequest {
     public MCmdCode code;
+    public int sn;
     public String data;
 
     public MRequest() {
     }
 
-    public MRequest(MCmdCode code, String data) {
+    public MRequest(int sn, MCmdCode code, String data) {
+        this.sn = sn;
         this.code = code;
         this.data = data;
+    }
+
+    public int getSn() {
+        return sn;
+    }
+
+    public MRequest setSn(int sn) {
+        this.sn = sn;
+        return this;
     }
 
     public MCmdCode getCode() {
@@ -36,17 +47,17 @@ public class MRequest {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MRequest mRequest = (MRequest) o;
-        return code == mRequest.code && Objects.equals(data, mRequest.data);
+        MRequest request = (MRequest) o;
+        return sn == request.sn && code == request.code && Objects.equals(data, request.data);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(code, data);
+        return Objects.hash(code, sn, data);
     }
 
     @Override
     public String toString() {
-        return "" + code + ": \"" + data + '"';
+        return "#" + sn + " " + code + ": \"" + data + '"';
     }
 }
