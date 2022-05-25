@@ -16,15 +16,17 @@ class ByteStreamToFrameDecoder extends ByteToMessageDecoder {
     }
 
     private String logPrefix = "";
+    private final int magic;
     private final int frameSizeLimit;
     private State state = State.HEADER;
     private Frame frame;
 
-    public ByteStreamToFrameDecoder() {
-        this(128);
+    public ByteStreamToFrameDecoder(int magic) {
+        this(magic, 128);
     }
 
-    public ByteStreamToFrameDecoder(int frameSizeLimit) {
+    public ByteStreamToFrameDecoder(int magic, int frameSizeLimit) {
+        this.magic = magic;
         if (frameSizeLimit < 8) {
             throw new IllegalArgumentException("Frame size limit too small");
         }
@@ -44,6 +46,10 @@ class ByteStreamToFrameDecoder extends ByteToMessageDecoder {
                     return;
                 }
                 int magic = in.readInt();
+                if (magic != this.magic) {
+                    throw new IllegalStateException(
+                            String.format("magic code mismatch, expect: 0x%X, actual: 0x%X", this.magic, magic));
+                }
                 int len = in.readInt();
                 byte control = in.readByte();
                 if (frame != null) {
@@ -70,5 +76,11 @@ class ByteStreamToFrameDecoder extends ByteToMessageDecoder {
             default:
                 throw new IllegalStateException("Unexpected");
         }
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        super.exceptionCaught(ctx, cause);
+        ctx.close();
     }
 }

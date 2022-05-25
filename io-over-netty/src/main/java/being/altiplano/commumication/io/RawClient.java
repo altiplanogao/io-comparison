@@ -55,15 +55,15 @@ class RawClient extends Client<byte[], byte[]> {
         }
     }
 
-    private ChannelHandler[] getChannelInitialHandlers(){
+    private ChannelHandler[] getChannelInitialHandlers() {
         return new ChannelHandler[]{
 //                new LoggingHandler(LogLevel.TRACE),
-                new ByteStreamToFrameDecoder(frameSize).setLogPrefix("client got response"), // inbound (response: bytes stream -> frame)
+                new ByteStreamToFrameDecoder(magic, frameSize).setLogPrefix("client got response"), // inbound (response: bytes stream -> frame)
                 new FramesToBlockDecoder(magic).setLogPrefix("client got response"), // inbound (response: frame -> block)
                 new BlockToRawObjectDecoder(this::onReceiveResponse).setLogPrefix("client got response"), // inbound (response: block -> raw bytes)
 
                 new FrameToByteStreamEncoder().setLogPrefix("client send request"),
-                new SliceToFramesEncoder(magic,frameSize).setLogPrefix("client send request"),
+                new SliceToFramesEncoder(magic, frameSize).setLogPrefix("client send request"),
 //                new SliceToByteStreamEncoder(magic, frameSize).setLogPrefix("client send request") // outbound (request: block -> frame -> bytes stream)
         };
     }

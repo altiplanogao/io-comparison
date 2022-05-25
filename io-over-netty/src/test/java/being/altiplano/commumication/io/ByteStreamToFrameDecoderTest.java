@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 class ByteStreamToFrameDecoderTest {
     @Test
     public void testDecodeOnce() {
-        EmbeddedChannel channel = new EmbeddedChannel(new ByteStreamToFrameDecoder());
+        EmbeddedChannel channel = new EmbeddedChannel(new ByteStreamToFrameDecoder(0x12345678));
 
         Frame data = new Frame(0x12345678, (byte) 0b11011000, "Hello World".getBytes(StandardCharsets.UTF_8));
 
@@ -27,11 +27,26 @@ class ByteStreamToFrameDecoderTest {
     }
 
     @Test
-    public void testDecodeTwice() {
-        EmbeddedChannel channel = new EmbeddedChannel(new ByteStreamToFrameDecoder());
+    public void testDecodeMagicMismatch() {
+        EmbeddedChannel channel = new EmbeddedChannel(new ByteStreamToFrameDecoder(0x12345678));
 
         Frame data0 = new Frame(0x12345678, (byte) 0b11011000, "Hello World".getBytes(StandardCharsets.UTF_8));
         Frame data1 = new Frame(0x87654321, (byte) 0b00100111, "Hello World2".getBytes(StandardCharsets.UTF_8));
+
+        Assertions.assertTrue(
+                channel.writeInbound(Unpooled.buffer().writeBytes(data0.getBytes(true, true))));
+        Assertions.assertTrue(channel.isActive());
+        Assertions.assertThrows(DecoderException.class, ()->
+                channel.writeInbound(Unpooled.buffer().writeBytes(data1.headBytes())));
+        Assertions.assertFalse(channel.isActive());
+    }
+
+    @Test
+    public void testDecodeTwice() {
+        EmbeddedChannel channel = new EmbeddedChannel(new ByteStreamToFrameDecoder(0x12345678));
+
+        Frame data0 = new Frame(0x12345678, (byte) 0b11011000, "Hello World".getBytes(StandardCharsets.UTF_8));
+        Frame data1 = new Frame(0x12345678, (byte) 0b00100111, "Hello World2".getBytes(StandardCharsets.UTF_8));
         for (Frame data : new Frame[]{data0, data1}) {
             Slice body = data.getBody();
             channel.writeInbound(Unpooled.buffer().writeBytes(data.headBytes()));
@@ -53,7 +68,7 @@ class ByteStreamToFrameDecoderTest {
     public void testDecodeFrameTooBig() {
         Frame data = new Frame(0x12345678, (byte) 0b11011000, "Hello World! Hello World! ".getBytes(StandardCharsets.UTF_8));
 
-        EmbeddedChannel channel = new EmbeddedChannel(new ByteStreamToFrameDecoder(10));
+        EmbeddedChannel channel = new EmbeddedChannel(new ByteStreamToFrameDecoder(0x12345678, 10));
 
         Assertions.assertThrows(DecoderException.class, () ->
                 Assertions.assertFalse(channel.writeInbound(Unpooled.buffer().writeBytes(data.headBytes()))));
